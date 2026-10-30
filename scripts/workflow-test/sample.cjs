@@ -44,7 +44,7 @@ function createSample(folder, points) {
       ).run(id, '[테스트] 과천 고객' + n);
       db.prepare(
         'INSERT INTO graves(id,customer_id,address,gisu,pyeong,business_region) VALUES(?,?,?,?,?,?)',
-      ).run(id, id, p.address, String(1 + (i % 3)), 10 + (i % 5), '서부');
+      ).run(id, id, p.address, String(1 + (i % 3)), 10 + (i % 5), '경기 서부');
       db.prepare(
         "INSERT INTO payments(grave_id,year,amount,source) VALUES(?,?,?,'workflow-test')",
       ).run(id, previousYear, 80000 + i * 1000);

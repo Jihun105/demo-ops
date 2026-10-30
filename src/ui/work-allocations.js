@@ -58,7 +58,13 @@
             { disabled: plan.outdated, checked: sheets.has(plan.id) && !plan.outdated },
           ),
         );
-      if (!data?.plans?.length)
+      // Before the first list arrives the panel says so, instead of "no sheets / no workers".
+      if (!data) {
+        for (const id of ['work-distribute-sheets', 'work-distribute-members'])
+          $(id).textContent = connectionId ? '불러오는 중…' : '';
+        return controls();
+      }
+      if (!data.plans.length)
         $('work-distribute-sheets').textContent = '작업 순서를 설정하면 배정할 시트가 표시됩니다.';
       else if (!open.length)
         $('work-distribute-sheets').textContent =
@@ -69,7 +75,7 @@
             checked: members.has(m.user_id),
           }),
         );
-      if (!data?.members?.length)
+      if (!data.members.length)
         $('work-distribute-members').textContent = '배정할 활성 작업자 계정이 없습니다.';
       for (const a of data?.assignments || []) {
         if (!a.userIds.length) continue;
@@ -122,7 +128,11 @@
       try {
         await fn();
       } catch (e) {
-        if (generation === epoch) message(e.message, true);
+        if (generation !== epoch) return;
+        message(e.message, true);
+        if (!data)
+          for (const id of ['work-distribute-sheets', 'work-distribute-members'])
+            $(id).textContent = '';
       } finally {
         if (generation === epoch) {
           busy = false;

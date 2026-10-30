@@ -1330,12 +1330,14 @@
       readWork: () => checkResult,
       onOrderSaved: status,
       showPlan: (id) => {
+        allocationUI?.invalidate(); // a new or recalculated sheet belongs in 작업 분배
         checkPlanId = id;
         checkFilter = 'all';
         selectTab('check');
         renderCheck();
       },
       onChanged: () => {
+        allocationUI?.invalidate();
         if (checkResult) renderCheck();
       },
     });

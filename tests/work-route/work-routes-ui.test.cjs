@@ -45,6 +45,7 @@ async function page(t) {
       },
     ],
     plans = [],
+    allocationLists = 0,
     generated,
     progress;
   const demo = {
@@ -109,6 +110,10 @@ async function page(t) {
       plans = [];
       return { ok: true };
     },
+    workAllocations: async (p) => {
+      if (p.action === 'list') allocationLists++;
+      return { ok: true, year: 2026, plans, members: [], assignments: [] };
+    },
   };
   const { w, d } = desktopScreen(t, {
     url: 'demo://desktop/index.html',
@@ -121,6 +126,7 @@ async function page(t) {
       'route-order-editor.js',
       'route-overview.js',
       'work-routes.js',
+      'work-allocations.js',
       'work.js',
     ],
   });
@@ -129,7 +135,14 @@ async function page(t) {
   await tick();
   d.getElementById('work-tab-manage').click();
   await tick();
-  return { w, d, generated: () => generated, rows, progress: () => progress };
+  return {
+    w,
+    d,
+    generated: () => generated,
+    rows,
+    progress: () => progress,
+    allocationLists: () => allocationLists,
+  };
 }
 async function choose(s) {
   s.d.getElementById('work-route-open').click();
@@ -459,4 +472,19 @@ test('순서를 만든 지역은 새 순서 설정의 지역 선택에서 빠지
   s.d.getElementById('work-route-recalculate').click();
   await tick();
   assert.deepEqual(cities().sort(), ['부천', '시흥']);
+});
+test('a new sheet from 순서 만들기 shows in 작업 분배 without 새로고침', async (t) => {
+  const s = await page(t);
+  s.d.getElementById('work-tab-distribute').click();
+  await tick();
+  assert.equal(s.allocationLists(), 1);
+  s.d.getElementById('work-tab-manage').click();
+  await tick();
+  await choose(s);
+  s.d.getElementById('work-route-generate').click();
+  await tick();
+  s.d.getElementById('work-tab-distribute').click();
+  await tick();
+  assert.equal(s.allocationLists(), 2, 'the list is read again after the sheet changed');
+  assert.match(s.d.getElementById('work-distribute-sheets').textContent, /부천\/시흥 · 2곳/);
 });

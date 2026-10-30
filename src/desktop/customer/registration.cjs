@@ -13,6 +13,11 @@ const AMOUNT_KEYS = AMOUNT_YEARS.map((year) => 'amount' + year);
 const registerFailed =
   '등록하지 못했습니다. DB 쓰기 권한과 다른 프로그램의 사용 여부를 확인해주세요. 입력 내용은 유지됩니다.';
 
+// '서부'처럼 줄여 쓰면 '경기 서부'와 다른 구역이 되어 지역 고르기에 버튼이 하나 더 생긴다.
+function fullBusinessRegion(value) {
+  const short = typeof value === 'string' && /^\s*(?:경기\s*)?(북부|동부|서부)\s*$/.exec(value);
+  return short ? '경기 ' + short[1] : value;
+}
 function normalize(values, { allowEmpty = false } = {}) {
   if (!values || typeof values !== 'object' || Array.isArray(values))
     throw new Error('입력 내용을 확인해주세요.');
@@ -43,6 +48,7 @@ function normalize(values, { allowEmpty = false } = {}) {
     (result.businessRegion.length > 100 || /[\p{Cc}]/u.test(result.businessRegion))
   )
     throw new Error('지역은 줄바꿈 없이 100자 이내로 입력해주세요.');
+  result.businessRegion = fullBusinessRegion(result.businessRegion);
   const managed = values.isManaged;
   if (managed !== undefined && !['0', '1'].includes(managed))
     throw new Error('관리 여부를 확인해주세요.');
@@ -166,4 +172,4 @@ async function registerCustomer(
   );
 }
 
-module.exports = { registerCustomer, normalize };
+module.exports = { registerCustomer, normalize, fullBusinessRegion };

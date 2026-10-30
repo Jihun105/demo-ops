@@ -79,6 +79,16 @@ test('관리 해제·지역 비우기와 새로운 지역명을 저장하고 잘
   d = readCustomerDetail(file, ids);
   assert.equal(d.values.isManaged, '0');
   assert.equal(d.values.businessRegion, '');
+  // A shortened business region joins its full group instead of becoming a fifth button.
+  for (const [typed, saved] of [
+    ['서부', '경기 서부'],
+    ['경기북부', '경기 북부'],
+    [' 동부 ', '경기 동부'],
+  ]) {
+    await updateCustomer(file, { ...d, values: { ...d.values, businessRegion: typed } });
+    d = readCustomerDetail(file, ids);
+    assert.equal(d.values.businessRegion, saved);
+  }
 });
 test('백업 실패 시 새 컬럼도 고객 정보도 추가하지 않는다', async (t) => {
   const { file, dir } = fixture(t, true);

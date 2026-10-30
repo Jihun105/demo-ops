@@ -120,3 +120,23 @@ test('returning to the 작업 분배 tab reuses the list until the company chang
   await s.ui.show();
   assert.equal(lists(), 4, 'another connection reads its own list');
 });
+test('before the first list arrives the panel says it is loading, not that nothing exists', async (t) => {
+  const { w, d } = desktopScreen(t, {
+    dialogs: true,
+    scripts: ['model.js', 'work-allocations.js'],
+  });
+  let answer;
+  const ui = w.demoWorkAllocations.create({ request: () => new Promise((r) => (answer = r)) });
+  ui.setConnection('c');
+  const shown = ui.show();
+  assert.equal(d.getElementById('work-distribute-sheets').textContent, '불러오는 중…');
+  assert.equal(d.getElementById('work-distribute-members').textContent, '불러오는 중…');
+  answer({ ok: false, message: '연결이 끊겼습니다.' });
+  await shown;
+  assert.equal(
+    d.getElementById('work-distribute-sheets').textContent,
+    '',
+    'a failed read clears it',
+  );
+  assert.match(d.getElementById('work-distribute-status').textContent, /연결이 끊겼습니다/);
+});

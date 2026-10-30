@@ -5,8 +5,13 @@ const { excelEditor } = require('../customer/excel-editor.cjs');
 const { draftStore } = require('./shared-drafts.cjs');
 const { salesSession, editable } = require('../work/sales-session.cjs');
 const { yearOf } = require('../work/work-check.cjs');
+const { fullBusinessRegion } = require('../customer/registration.cjs');
 // Fields of one customer/grave update sent to the server.
 const CUSTOMER_FIELDS = ['customerId', 'graveId', 'revision', 'values', 'payments'];
+const withFullRegion = (values) =>
+  typeof values?.businessRegion === 'string'
+    ? { ...values, businessRegion: fullBusinessRegion(values.businessRegion) }
+    : values;
 function installSharedHandlers({
   ipcMain,
   validateSender,
@@ -263,8 +268,10 @@ function installSharedHandlers({
           type: 'register',
           ...pick(payload, ['values', 'registrationStatus', 'draftId', 'fromRequest']),
         };
+        if (input.values) input.values = withFullRegion(input.values);
       } else if (channel === 'customer:update') {
         const row = pick(payload, CUSTOMER_FIELDS);
+        if (row.values) row.values = withFullRegion(row.values);
         // Office: only requirements/special notes are sent; the server rejects anything else.
         input = {
           type: 'update-customers',
