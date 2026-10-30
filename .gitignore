@@ -1,0 +1,76 @@
+# 의존성과 재생성 가능한 빌드 결과
+node_modules/
+mobile/dist/
+mobile/android/.gradle/
+mobile/android/**/build/
+artifacts/
+supabase/.temp/
+supabase/.branches/
+
+# 실제 고객 자료와 기기별 설정 (소스 저장소에 올리지 않음)
+data/
+config/google-maps.cjs
+config/kakao-maps.cjs
+config/mobile-maps.cjs
+config/mobile-company.cjs
+.local-state/
+.demo-backups/
+.demo-map/
+.demo-mobile/
+.demo-earth/
+작업자료/
+Google Earth/
+엑셀내보내기/
+*.db
+*.db-*
+*.sqlite*
+*.xlsx
+*.xls
+*.numbers
+*.kml
+*.kmz
+
+# 인증정보와 앱 서명 파일
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+*.mobileprovision
+*.provisionprofile
+*.tar.gz
+*.zip
+
+# IDE 사용자 상태와 배포 산출물
+.idea/
+**/xcuserdata/
+**/DerivedData/
+*.xcuserstate
+*.apk
+*.aab
+*.ipa
+*.dmg
+*.exe
+*.log
+
+# 운영체제/도구 임시 파일
+__pycache__/
+*.pyc
+.DS_Store
+.superpowers/
+
+# Android release 서명 설정(잘못 프로젝트에 복사한 경우에도 제외)
+android-signing.json
+key.properties
+keystore.properties
+signing.properties
+auth-settings.json
+
+# 고객 내용을 포함하는 개인 공동 서버 이전 준비 파일
+prepared.json
+shared-migration-backups/
+shared-desktop-prepared/

@@ -1,0 +1,65 @@
+# Only scripts/local-test uses this configuration. Never link it to a cloud project.
+project_id = "demo-local-test"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.seed]
+enabled = false
+
+[db.pooler]
+enabled = false
+
+[realtime]
+enabled = true
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[local_smtp]
+enabled = false
+
+[storage]
+enabled = false
+
+[analytics]
+enabled = false
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:54323"
+additional_redirect_urls = []
+enable_signup = false
+enable_anonymous_sign_ins = false
+minimum_password_length = 12
+
+[auth.email]
+# Enables email/password login; global auth.enable_signup still blocks self-registration.
+enable_signup = true
+enable_confirmations = false
+
+[auth.rate_limit]
+sign_in_sign_ups = 200
+token_refresh = 300
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 8083
+deno_version = 2
+
+[functions.bank-deposits]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/bank-deposits/index.ts"

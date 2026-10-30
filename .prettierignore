@@ -1,0 +1,22 @@
+# .gitignore에 있는 항목은 Prettier가 함께 읽어 제외하므로 여기에는 Prettier 전용 항목만 둡니다.
+mobile/ios/
+mobile/android/**
+!mobile/android/app/
+!mobile/android/app/src/
+!mobile/android/app/src/main/
+!mobile/android/app/src/main/java/
+!mobile/android/app/src/main/java/kr/
+!mobile/android/app/src/main/java/kr/demo/
+!mobile/android/app/src/main/java/kr/demo/field/
+!mobile/android/app/src/main/java/kr/demo/field/*.java
+!mobile/android/app/src/test/
+!mobile/android/app/src/test/java/
+!mobile/android/app/src/test/java/kr/
+!mobile/android/app/src/test/java/kr/demo/
+!mobile/android/app/src/test/java/kr/demo/field/
+!mobile/android/app/src/test/java/kr/demo/field/*.java
+package-lock.json
+mobile/package-lock.json
+src/ui/map-frame/boundaries.js
+# 동결된 서버 배포본은 재서식하지 않습니다.
+database/cloud/releases/*.json

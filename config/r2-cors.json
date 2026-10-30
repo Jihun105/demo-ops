@@ -1,0 +1,20 @@
+[
+  {
+    "AllowedOrigins": [
+      "https://localhost",
+      "capacitor://localhost",
+      "demo://field",
+      "http://127.0.0.1:8091",
+      "http://localhost:8091"
+    ],
+    "AllowedMethods": ["GET", "PUT", "HEAD"],
+    "AllowedHeaders": [
+      "content-type",
+      "content-length",
+      "x-amz-checksum-crc32",
+      "x-amz-sdk-checksum-algorithm"
+    ],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]

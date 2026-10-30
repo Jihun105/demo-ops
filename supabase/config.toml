@@ -1,0 +1,18 @@
+# The handler verifies every request with auth.getUser and demo_access.
+[functions.staff-accounts]
+verify_jwt = false
+
+# The report handler verifies login, workspace membership and upload role.
+[functions.work-reports]
+verify_jwt = false
+
+[functions.bank-deposits]
+verify_jwt = false
+
+# The Earth archive handler verifies login, company and owner/master access.
+[functions.earth-assets]
+verify_jwt = false
+
+# Routing verifies the actual user, company and owner/master role on every request.
+[functions.work-routing]
+verify_jwt = false

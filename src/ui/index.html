@@ -1,0 +1,2168 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; frame-src http://127.0.0.1:8092; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="color-scheme" content="dark" />
+    <title>(주)데모 업무관리</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="map.css" />
+    <script src="permissions.js" defer></script>
+    <script src="dialogs.js" defer></script>
+    <script src="model.js" defer></script>
+    <script src="map-frame/boundaries.js" defer></script>
+    <script src="home.js" defer></script>
+    <script src="earth-import.js" defer></script>
+    <script src="shared-save.js" defer></script>
+    <script src="customer-detail.js" defer></script>
+    <script src="privacy.js" defer></script>
+    <script src="kml-folder-setting.js" defer></script>
+    <script src="registration-review.js" defer></script>
+    <script src="billing.js" defer></script>
+    <script src="app.js" defer></script>
+    <script src="address-regions.js" defer></script>
+    <script src="registration-address.js" defer></script>
+    <script src="sidebar.js" defer></script>
+    <script src="sales-assignment.js" defer></script>
+    <script src="region-picker.js" defer></script>
+    <script src="route-order-editor.js" defer></script>
+    <script src="route-overview.js" defer></script>
+    <script src="work-routes.js" defer></script>
+    <script src="work-allocations.js" defer></script>
+    <script src="work.js" defer></script>
+    <script src="accounts.js" defer></script>
+    <script src="excel-preview.js" defer></script>
+    <script src="map.js" defer></script>
+    <script src="tab-indicator.js" defer></script>
+  </head>
+  <body>
+    <header class="titlebar">
+      <div class="window-brand">
+        <img src="brand.svg" alt="" width="24" height="24" /><span>(주)데모 업무관리</span>
+      </div>
+      <div class="window-controls">
+        <button data-window="minimize" aria-label="최소화"><span data-icon="minus"></span></button
+        ><button data-window="maximize" aria-label="최대화 또는 이전 크기로">
+          <span data-icon="square"></span></button
+        ><button data-window="close" class="close-window" aria-label="닫기">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+    </header>
+    <div class="workspace">
+      <aside class="sidebar is-collapsed" id="sidebar">
+        <div class="brand">
+          <img src="brand.svg" alt="" width="45" height="45" />
+          <div><strong>(주)데모</strong></div>
+        </div>
+        <nav aria-label="업무 메뉴">
+          <button class="nav-item active" data-page="home" aria-current="page" data-view="read">
+            <span data-icon="home"></span><span>업무 현황</span>
+          </button>
+          <button class="nav-item" data-page="customers">
+            <span data-icon="users"></span><span>고객 관리</span>
+          </button>
+          <button class="nav-item" data-page="work" data-view="read">
+            <span data-icon="database"></span><span>작업 관리</span>
+          </button>
+          <button class="nav-item" id="open-billing" data-page="billing" data-view="billing">
+            <span data-icon="billing"></span><span>청구·입금</span>
+          </button>
+          <button class="nav-item" data-page="map" data-view="read">
+            <span data-icon="map"></span><span>묘지 지도</span>
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <button class="nav-item settings-nav" data-page="settings">
+            <span data-icon="settings"></span><span>설정</span>
+          </button>
+          <div class="connection-status" id="connection-status" data-view="read">
+            <span class="status-dot"></span><span id="connection-label">DB 확인 중</span>
+          </div>
+        </div>
+        <div
+          id="sidebar-resize"
+          class="sidebar-resize"
+          role="separator"
+          tabindex="0"
+          aria-label="사이드바 너비 조절"
+          aria-orientation="vertical"
+          aria-controls="sidebar"
+          aria-valuemin="72"
+          aria-valuemax="360"
+          aria-valuenow="72"
+          title="드래그하여 너비 조절 · 좁게 줄이면 접기 · 두 번 클릭하면 접기/펼치기"
+        ></div>
+      </aside>
+      <main>
+        <header class="page-header">
+          <div class="page-heading">
+            <h1 id="page-title">업무 현황</h1>
+            <div id="page-header-tabs" class="page-header-tabs"></div>
+          </div>
+          <div class="page-header-tools">
+            <button
+              class="refresh-button"
+              id="refresh"
+              aria-label="DB 자료 새로고침"
+              data-view="read"
+              hidden
+            >
+              <span data-icon="refresh"></span><span>새로고침</span>
+            </button>
+            <div class="company">
+              <div><strong>(주)데모</strong></div>
+            </div>
+          </div>
+        </header>
+        <section id="home-page" aria-label="업무 현황">
+          <div class="home-board">
+            <section class="home-panel" aria-labelledby="home-map-title">
+              <h2 id="home-map-title">구역별 작업</h2>
+              <svg id="home-map" role="group" aria-label="업무 구역 지도"></svg>
+            </section>
+            <section class="home-panel home-detail" aria-live="polite">
+              <p class="home-caption">선택한 구역</p>
+              <h2 id="home-region-name" class="home-region-name"></h2>
+              <dl class="home-stats">
+                <div>
+                  <dt>전체 묘지</dt>
+                  <dd id="home-graves">—</dd>
+                </div>
+                <div>
+                  <dt>올해 작업 묘지</dt>
+                  <dd id="home-work">—</dd>
+                </div>
+                <div>
+                  <dt>올해 작업 완료</dt>
+                  <dd id="home-done">—</dd>
+                </div>
+                <div>
+                  <dt>올해 신규 등록</dt>
+                  <dd>—</dd>
+                </div>
+              </dl>
+              <p class="home-caption" id="home-cities-title"></p>
+              <ul class="home-cities" id="home-cities"></ul>
+            </section>
+          </div>
+        </section>
+        <section id="settings-page" aria-label="설정" hidden>
+          <details id="privacy-settings" data-view="read">
+            <summary class="settings-row">
+              <span class="settings-copy"><strong>저장소 상태</strong></span>
+            </summary>
+            <button id="privacy-refresh" class="secondary-button" type="button">상태 확인</button>
+            <p id="privacy-status" role="status">확인 전입니다.</p>
+            <dl id="storage-stats" class="storage-stats" hidden></dl>
+            <p>회계 증빙은 분리 보관합니다. 미접속 기기와 백업은 별도 확인이 필요합니다.</p>
+            <div id="privacy-media" data-feature="privacy">
+              <button id="storage-check" class="secondary-button" type="button">저장소 점검</button>
+              <p id="storage-check-result" role="status">
+                점검은 저장소에 실제로 있는 파일과 기록을 맞춰 보기만 하고, 파일을 지우지 않습니다.
+              </p>
+            </div>
+          </details>
+          <button class="settings-row" id="desktop-sync-check" data-view="read">
+            <span data-icon="refresh"></span
+            ><span class="settings-copy"
+              ><strong>최신 자료 다시 불러오기</strong
+              ><span id="desktop-sync-status" role="status">자동 공유</span></span
+            >
+          </button>
+          <button class="settings-row" id="desktop-logout">
+            <span data-icon="close"></span
+            ><span class="settings-copy"><strong>로그아웃</strong></span>
+          </button>
+          <div class="settings-row kml-folder-row" id="kml-folder-setting">
+            <span data-icon="folder"></span>
+            <span class="settings-copy">
+              <strong>KML 저장 폴더</strong>
+              <span id="kml-folder-path" role="status">확인 중입니다.</span>
+              <span class="kml-folder-hint"
+                >Google Earth에서 저장한 KML을 앱 전용 폴더와 이 폴더에서 찾습니다. 이 PC에만
+                적용됩니다.</span
+              >
+            </span>
+            <span class="kml-folder-actions">
+              <button id="kml-folder-choose" type="button" class="secondary-button">
+                폴더 선택
+              </button>
+              <button id="kml-folder-reset" type="button" class="secondary-button" hidden>
+                기본값으로
+              </button>
+            </span>
+          </div>
+          <button class="settings-row" id="open-accounts" data-page="accounts" data-view="read">
+            <span data-icon="users"></span>
+            <span class="settings-copy"><strong>직원 계정 관리</strong></span>
+            <span data-icon="chevron-right"></span>
+          </button>
+          <details id="usage-shortcuts" data-view="read">
+            <summary class="settings-row">
+              <span data-icon="database"></span>
+              <span class="settings-copy"><strong>서버 사용량</strong></span>
+              <span data-icon="chevron-right"></span>
+            </summary>
+            <div class="usage-links">
+              <button class="settings-row" data-usage="cloudflare">
+                <span class="settings-copy"
+                  ><strong>Cloudflare R2</strong
+                  ><span>사진 저장 용량 · 업로드 · 조회 사용량</span></span
+                >
+                <span data-icon="external"></span>
+              </button>
+              <button class="settings-row" data-usage="supabase">
+                <span class="settings-copy"
+                  ><strong>Supabase</strong><span>DB 용량 · 데이터 전송 · 함수 호출</span></span
+                >
+                <span data-icon="external"></span>
+              </button>
+              <p class="usage-note">
+                브라우저에서 열립니다. 서비스 계정 로그인이 필요할 수 있습니다.
+              </p>
+            </div>
+          </details>
+          <details id="map-data-credits">
+            <summary>라이선스 및 출처</summary>
+            <div class="credits-content">
+              <p class="usage-note">
+                행정경계: SGIS · vuski/admdongkor · CC BY 4.0 · 2026.07. 이 앱에서 시군 병합·경계
+                단순화를 적용했습니다.
+              </p>
+              <p class="usage-note">
+                원자료: 통계청 통계지리정보서비스(SGIS, https://sgis.kostat.go.kr) · 공공누리
+                제1유형(출처표시).
+              </p>
+              <p class="usage-note">
+                가공: vuski/admdongkor (https://github.com/vuski/admdongkor). 라이선스:
+                https://creativecommons.org/licenses/by/4.0/
+              </p>
+            </div>
+          </details>
+        </section>
+        <section id="accounts-page" aria-label="직원 계정 관리" hidden>
+          <div class="accounts-toolbar">
+            <button id="accounts-back" data-page="settings" class="secondary-button">
+              <span data-icon="chevron-left"></span>설정
+            </button>
+            <button id="desktop-staff-refresh" class="secondary-button">
+              <span data-icon="refresh"></span>새로고침
+            </button>
+          </div>
+          <div class="accounts-layout">
+            <section aria-labelledby="staff-list-title">
+              <h2 id="staff-list-title">등록한 직원</h2>
+              <p id="desktop-staff-status" role="status"></p>
+              <div class="accounts-table-scroll">
+                <table class="accounts-table">
+                  <thead>
+                    <tr>
+                      <th>직원 이름</th>
+                      <th>아이디</th>
+                      <th>권한</th>
+                      <th>상태</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="desktop-staff-list"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="accounts-create" aria-labelledby="staff-create-title">
+              <h2 id="staff-create-title">직원 계정 발급</h2>
+              <form id="desktop-staff-form" data-feature="staff">
+                <fieldset id="desktop-staff-fields" class="register-grid">
+                  <label
+                    >직원 이름<input
+                      id="desktop-staff-name"
+                      required
+                      maxlength="80"
+                      autocomplete="off"
+                  /></label>
+                  <label
+                    >아이디<input
+                      id="desktop-staff-login"
+                      required
+                      minlength="3"
+                      maxlength="32"
+                      pattern="[a-zA-Z0-9][a-zA-Z0-9._-]{2,31}"
+                      placeholder="영문·숫자 3~32자"
+                      autocomplete="off"
+                      autocapitalize="none"
+                  /></label>
+                  <label
+                    >비밀번호<input
+                      id="desktop-staff-password"
+                      type="password"
+                      required
+                      minlength="12"
+                      maxlength="128"
+                      placeholder="12자 이상"
+                      autocomplete="new-password"
+                  /></label>
+                  <label
+                    >권한<select id="desktop-staff-role">
+                      <option value="worker">일반 작업자</option>
+                      <option value="sales">영업</option>
+                      <option value="office">관리자</option>
+                      <option value="submaster">부마스터</option>
+                      <option value="master">마스터</option>
+                    </select></label
+                  >
+                  <button class="primary-button" type="submit">계정 발급</button>
+                </fieldset>
+              </form>
+            </section>
+          </div>
+        </section>
+        <section id="billing-page" aria-label="청구·입금" data-view="billing" hidden>
+          <div id="billing-tabs" class="tabs" role="tablist" aria-label="청구·입금 메뉴">
+            <button
+              id="billing-tab-claims"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="billing-claims"
+            >
+              청구서 <span id="billing-claims-count" class="billing-tab-count"></span>
+            </button>
+            <button
+              id="billing-tab-pending"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="billing-pending"
+              tabindex="-1"
+            >
+              확인 대기 입금
+              <span id="billing-pending-count" class="billing-tab-badge" hidden></span>
+            </button>
+          </div>
+          <div
+            id="billing-claims"
+            class="page-panel"
+            role="tabpanel"
+            aria-labelledby="billing-tab-claims"
+          >
+            <div class="page-toolbar">
+              <div class="page-toolbar-fields">
+                <label class="page-field"
+                  >연도
+                  <select id="billing-year"></select
+                ></label>
+                <input
+                  id="billing-search"
+                  class="page-search"
+                  type="search"
+                  placeholder="고객 이름 · 묘지 번호"
+                  aria-label="청구서 검색"
+                />
+              </div>
+              <button id="billing-refresh" class="work-secondary" type="button">새로고침</button>
+            </div>
+            <div id="billing-tiles" class="billing-tiles"></div>
+            <div
+              id="billing-filters"
+              class="billing-filters work-table-filters"
+              role="group"
+              aria-label="상태로 거르기"
+            >
+              <button type="button" data-filter="all" aria-pressed="true">
+                전체 <span data-count></span>
+              </button>
+              <button type="button" data-filter="unsent" aria-pressed="false">
+                문자 전 <span data-count></span>
+              </button>
+              <button type="button" data-filter="wait" aria-pressed="false">
+                입금 대기 <span data-count></span>
+              </button>
+              <button type="button" data-filter="thanks" aria-pressed="false">
+                최종 문자 <span data-count></span>
+              </button>
+              <button type="button" data-filter="done" aria-pressed="false">
+                완료 <span data-count></span>
+              </button>
+            </div>
+            <p id="billing-status" class="work-status" role="status" aria-live="polite"></p>
+            <div class="page-table-scroll">
+              <table class="page-table billing-table" aria-label="청구서 목록">
+                <thead>
+                  <tr>
+                    <th>묘지</th>
+                    <th>고객</th>
+                    <th class="page-number">금액</th>
+                    <th>청구 문자</th>
+                    <th>입금</th>
+                    <th>최종 문자</th>
+                    <th>상태</th>
+                  </tr>
+                </thead>
+                <tbody id="billing-list"></tbody>
+              </table>
+            </div>
+          </div>
+          <div
+            id="billing-pending"
+            class="page-panel"
+            role="tabpanel"
+            aria-labelledby="billing-tab-pending"
+            hidden
+          >
+            <div class="page-toolbar">
+              <button id="billing-pending-refresh" class="work-secondary" type="button">
+                새로고침
+              </button>
+            </div>
+            <p id="billing-pending-status" class="work-status" role="status" aria-live="polite"></p>
+            <div class="page-table-scroll">
+              <table class="page-table billing-table" aria-label="확인 대기 입금 목록">
+                <thead>
+                  <tr>
+                    <th>받은 때</th>
+                    <th>입금자</th>
+                    <th class="page-number">금액</th>
+                    <th class="page-action"><span class="visually-hidden">확인</span></th>
+                  </tr>
+                </thead>
+                <tbody id="billing-pending-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section id="customers-page" aria-label="고객 관리" hidden>
+          <div class="tabs" role="tablist" aria-label="고객 관리 메뉴">
+            <button
+              id="tab-all"
+              data-view="read"
+              role="tab"
+              aria-selected="true"
+              aria-controls="customer-panel"
+              tabindex="0"
+            >
+              전체 고객</button
+            ><button
+              id="tab-register"
+              role="tab"
+              aria-selected="false"
+              aria-controls="register-panel"
+              tabindex="-1"
+            >
+              신규 등록
+            </button>
+            <button
+              id="tab-review"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="review-panel"
+              tabindex="-1"
+              data-view="register"
+              hidden
+            >
+              등록 검토
+            </button>
+            <button
+              id="tab-declined"
+              data-view="read"
+              role="tab"
+              aria-selected="false"
+              aria-controls="customer-panel"
+              tabindex="-1"
+            >
+              거절 목록
+            </button>
+            <button
+              id="tab-deleted"
+              data-view="read"
+              role="tab"
+              aria-selected="false"
+              aria-controls="customer-panel"
+              tabindex="-1"
+            >
+              삭제 목록
+            </button>
+          </div>
+          <div id="customer-panel" role="tabpanel" aria-labelledby="tab-all" data-view="read">
+            <div id="connection-notice" class="connection-notice" role="status" hidden>
+              <span class="notice-icon" data-icon="database"></span>
+              <h2 id="notice-title">고객 관리 DB를 연결해주세요</h2>
+              <p id="notice-description">company.db 파일을 선택하면 고객 목록이 표시됩니다.</p>
+              <button id="notice-choose" class="primary-button">DB 파일 선택</button>
+            </div>
+            <div id="customer-content" hidden>
+              <div class="customer-tools">
+                <section id="region-controls" class="region-controls" aria-label="지역 선택">
+                  <div id="region-picker" class="region-picker">
+                    <button
+                      id="region-toggle"
+                      class="region-toggle"
+                      type="button"
+                      aria-expanded="false"
+                      aria-controls="region-panel"
+                    >
+                      지역 <span data-icon="chevron-right" aria-hidden="true"></span>
+                    </button>
+                    <div id="region-panel" class="region-panel" hidden>
+                      <div
+                        id="region-groups"
+                        class="region-groups"
+                        role="group"
+                        aria-label="업무 구역"
+                      ></div>
+                      <label class="region-search" for="region-query"
+                        >지역 선택
+                        <input
+                          id="region-query"
+                          type="search"
+                          placeholder="지역 검색"
+                          aria-label="지역 검색"
+                          aria-controls="region-list"
+                          autocomplete="off"
+                        />
+                      </label>
+                      <div id="region-list" class="region-list" aria-label="지역 목록"></div>
+                      <p id="region-empty" class="region-empty" role="status" hidden>
+                        검색 결과가 없습니다.
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    id="region-selected"
+                    class="region-selected"
+                    aria-label="선택한 지역"
+                    hidden
+                  ></div>
+                  <span id="region-summary" class="region-summary">전체 지역</span>
+                </section>
+                <form
+                  id="customer-search"
+                  class="customer-search"
+                  role="search"
+                  aria-label="고객 검색"
+                >
+                  <label class="search-input customer-search-input"
+                    ><span data-icon="search"></span
+                    ><input
+                      id="search-query"
+                      type="search"
+                      placeholder="이름, 전화번호, 지역, 묘지위치 등으로 검색"
+                      aria-label="고객 통합 검색"
+                      autocomplete="off"
+                  /></label>
+                  <button class="primary-button" type="submit">검색</button>
+                </form>
+              </div>
+              <section class="results" aria-label="고객 목록">
+                <div class="results-heading">
+                  <h2 id="list-title">전체 고객 목록</h2>
+                  <span
+                    id="result-count"
+                    class="result-count"
+                    role="status"
+                    aria-live="polite"
+                  ></span
+                  ><button
+                    id="open-excel"
+                    class="excel-button"
+                    title="지역별 시트에서 확인하고 수정하기"
+                  >
+                    엑셀로 보기
+                  </button>
+                </div>
+                <p id="excel-status" class="excel-note" role="status" hidden></p>
+                <div class="table-frame">
+                  <div
+                    class="table-scroll"
+                    id="table-scroll"
+                    tabindex="0"
+                    role="region"
+                    aria-label="고객 상세 표, 가로로 스크롤해 나머지 항목 보기"
+                  >
+                    <table aria-label="고객 및 묘지 상세 목록">
+                      <thead>
+                        <tr id="customer-head"></tr>
+                      </thead>
+                      <tbody id="customer-rows"></tbody>
+                    </table>
+                  </div>
+                  <div id="table-message" class="table-message" role="status" hidden></div>
+                </div>
+                <div class="table-footer"><span id="updated-time"></span></div>
+              </section>
+            </div>
+          </div>
+          <section id="register-panel" role="tabpanel" aria-labelledby="tab-register" hidden>
+            <div class="register-heading">
+              <h2 class="visually-hidden">신규 등록</h2>
+
+              <p id="register-no-db" hidden>고객 DB가 연결되지 않았습니다.</p>
+            </div>
+            <form id="register-form" class="register-form" autocomplete="off">
+              <div class="register-scroll">
+                <fieldset id="register-fields" class="register-grid" aria-label="신규 고객 정보">
+                  <div class="register-wide register-address-row">
+                    <span id="register-address-label">묘지위치</span>
+                    <div
+                      class="register-address-fields"
+                      role="group"
+                      aria-labelledby="register-address-label"
+                    >
+                      <div class="register-address-regions">
+                        <select id="register-province" aria-label="시·도">
+                          <option value="">시·도 선택</option>
+                        </select>
+                        <select id="register-city" aria-label="시·군·구" disabled>
+                          <option value="">시·군·구 선택</option>
+                        </select>
+                      </div>
+                      <input
+                        id="register-address-detail"
+                        type="text"
+                        maxlength="500"
+                        aria-label="상세주소"
+                        placeholder="읍·면·동, 지번 또는 도로명 주소"
+                      />
+                      <input id="register-address" name="address" type="hidden" />
+                      <div class="earth-location-actions">
+                        <button
+                          id="register-earth-import"
+                          data-feature="register"
+                          type="button"
+                          class="secondary-button"
+                          disabled
+                        >
+                          어스 위치 가져오기
+                        </button>
+                        <button
+                          id="register-earth-clear"
+                          type="button"
+                          class="secondary-button"
+                          hidden
+                        >
+                          선택 해제
+                        </button>
+                      </div>
+                      <p id="register-earth-summary" class="earth-location-summary" hidden></p>
+                      <p id="register-address-status" role="status" aria-live="polite"></p>
+                    </div>
+                  </div>
+
+                  <label class="management-toggle register-wide">
+                    <input name="isManaged" type="hidden" value="0" />
+                    <input id="register-managed-check" type="checkbox" />꾸준히 관리하는 묘지
+                  </label>
+                  <input name="businessRegion" type="hidden" />
+                  <label
+                    >기수<input name="gisu" type="text" maxlength="10000" placeholder="—"
+                  /></label>
+                  <label
+                    >평수<input
+                      name="pyeong"
+                      type="text"
+                      inputmode="decimal"
+                      maxlength="10000"
+                      placeholder="—"
+                  /></label>
+
+                  <label
+                    >이름<input name="name" type="text" maxlength="10000" placeholder="—"
+                  /></label>
+                  <label
+                    >전화번호<input name="phone" type="tel" maxlength="10000" placeholder="—"
+                  /></label>
+                  <label
+                    >금액 (원)<input
+                      name="amount"
+                      type="text"
+                      inputmode="numeric"
+                      maxlength="10000"
+                      placeholder="—"
+                  /></label>
+                  <label class="register-wide"
+                    >고객 요구사항<textarea
+                      name="requirements"
+                      rows="3"
+                      maxlength="10000"
+                      placeholder="—"
+                    ></textarea>
+                  </label>
+                  <label class="register-wide"
+                    >특이사항<textarea
+                      name="specialNotes"
+                      rows="3"
+                      maxlength="10000"
+                      placeholder="—"
+                    ></textarea>
+                  </label>
+                </fieldset>
+              </div>
+
+              <div class="register-footer">
+                <p id="register-status" role="status" aria-live="polite"></p>
+                <div class="register-actions">
+                  <button id="register-clear" class="secondary-button" type="button">
+                    내용 지우기
+                  </button>
+                  <button
+                    id="register-decline"
+                    class="secondary-button"
+                    type="button"
+                    data-feature="register"
+                  >
+                    거절
+                  </button>
+                  <button
+                    id="register-submit"
+                    class="primary-button"
+                    type="button"
+                    data-feature="register"
+                  >
+                    등록
+                  </button>
+                </div>
+              </div>
+            </form>
+          </section>
+          <div
+            id="review-panel"
+            class="page-panel"
+            role="tabpanel"
+            aria-labelledby="tab-review"
+            data-view="register"
+            hidden
+          >
+            <div class="page-toolbar">
+              <p id="review-status" class="work-note" role="status" aria-live="polite"></p>
+              <button id="review-refresh" class="work-secondary" type="button">새로고침</button>
+            </div>
+            <div class="page-table-scroll">
+              <table class="page-table review-table" aria-label="등록 검토 요청">
+                <thead>
+                  <tr>
+                    <th>접수</th>
+                    <th>올린 사람</th>
+                    <th>이름</th>
+                    <th>묘지위치</th>
+                    <th>구분</th>
+                    <th>위치</th>
+                    <th class="page-action"><span class="visually-hidden">검토</span></th>
+                  </tr>
+                </thead>
+                <tbody id="review-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section id="work-page" aria-label="작업 관리" hidden>
+          <div id="work-tabs" class="tabs" role="tablist" aria-label="작업 관리 메뉴">
+            <button
+              id="work-tab-sales"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="work-sales-panel"
+              tabindex="0"
+            >
+              영업 확인
+            </button>
+            <button
+              id="work-tab-manage"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="work-manage-panel"
+              tabindex="-1"
+            >
+              작업 관리
+            </button>
+            <button
+              id="work-tab-check"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="work-check-panel"
+              tabindex="-1"
+            >
+              작업 확인
+            </button>
+            <button
+              id="work-tab-distribute"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="work-distribute-panel"
+              tabindex="-1"
+            >
+              작업 분배
+            </button>
+          </div>
+          <div class="work-toolbar">
+            <h2 id="work-heading" class="visually-hidden">영업 확인</h2>
+          </div>
+          <p id="work-status" class="work-status" role="status" aria-live="polite"></p>
+          <section
+            id="work-distribute-panel"
+            role="tabpanel"
+            aria-labelledby="work-tab-distribute"
+            hidden
+          >
+            <div class="allocation-toolbar">
+              <p class="work-note">
+                선택한 시트를 선택한 작업자 모두에게 배정합니다. 배정한 시트는 배정 현황으로
+                옮겨집니다.
+              </p>
+              <button id="work-distribute-refresh" type="button" class="work-secondary">
+                새로고침
+              </button>
+            </div>
+            <div class="allocation-columns">
+              <fieldset>
+                <legend>작업 시트</legend>
+                <div id="work-distribute-sheets"></div>
+              </fieldset>
+              <fieldset>
+                <legend>작업자 계정</legend>
+                <div id="work-distribute-members"></div>
+              </fieldset>
+            </div>
+            <div class="allocation-footer">
+              <p
+                id="work-distribute-status"
+                class="work-status"
+                role="status"
+                aria-live="polite"
+              ></p>
+              <button id="work-distribute-save" type="button" class="primary-button">
+                선택 시트 배정
+              </button>
+            </div>
+            <h3>배정 현황</h3>
+            <div class="allocation-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>시트</th>
+                    <th>작업 수</th>
+                    <th>배정 작업자</th>
+                    <th>상태</th>
+                    <th>변경</th>
+                  </tr>
+                </thead>
+                <tbody id="work-distribute-list"></tbody>
+              </table>
+            </div>
+          </section>
+          <div id="work-sales-panel" role="tabpanel" aria-labelledby="work-tab-sales">
+            <div class="work-sales-toolbar">
+              <div id="work-sales-regions"></div>
+              <label hidden for="work-sales-region"
+                >지역<select id="work-sales-region">
+                  <option value="">지역 선택</option>
+                </select></label
+              >
+              <form
+                id="work-sales-search-form"
+                class="work-sales-search"
+                role="search"
+                aria-label="영업 대상 이름 검색"
+              >
+                <div class="work-sales-search-controls">
+                  <input
+                    id="work-sales-search"
+                    aria-label="이름 검색"
+                    type="search"
+                    maxlength="100"
+                    placeholder="이름의 일부 입력"
+                  />
+                  <button class="work-secondary" type="submit">검색</button>
+                </div>
+              </form>
+            </div>
+            <button id="work-sales-review" class="work-secondary" type="button" hidden>
+              배정 확인 필요
+            </button>
+            <button id="work-sales-resume" class="work-secondary" type="button" hidden>
+              배정 다시 확인
+            </button>
+            <div id="work-sales-empty" class="work-empty">
+              <h3 id="work-sales-empty-title">지역을 선택해주세요</h3>
+              <p id="work-sales-empty-note">선택한 지역의 고객을 한 명씩 확인합니다.</p>
+            </div>
+            <div id="work-sales-card" class="work-sales-card" hidden>
+              <div class="work-sales-customer">
+                <div class="work-sales-customer-heading">
+                  <h3 id="work-sales-name" tabindex="-1"></h3>
+                  <p id="work-sales-position" class="work-note"></p>
+                </div>
+                <dl>
+                  <div>
+                    <dt>묘지 주소</dt>
+                    <dd id="work-sales-address"></dd>
+                  </div>
+                  <div>
+                    <dt>전화번호</dt>
+                    <dd id="work-sales-phone"></dd>
+                  </div>
+                  <div class="work-sales-grave-size">
+                    <dt>기수</dt>
+                    <dd id="work-sales-gisu"></dd>
+                    <dt>평수</dt>
+                    <dd id="work-sales-pyeong"></dd>
+                  </div>
+                  <div>
+                    <dt id="work-sales-previous-label">전년도 금액</dt>
+                    <dd id="work-sales-previous-amount"></dd>
+                  </div>
+                </dl>
+              </div>
+              <form id="work-sales-form" class="work-sales-form">
+                <div class="work-sales-inputs">
+                  <div class="work-sales-notes-fields">
+                    <label for="work-sales-requirements"
+                      >고객 요구사항<textarea
+                        id="work-sales-requirements"
+                        rows="4"
+                        maxlength="10000"
+                        placeholder="고객이 요청한 내용"
+                      ></textarea>
+                    </label>
+                    <label for="work-sales-notes"
+                      >특이사항<textarea
+                        id="work-sales-notes"
+                        rows="4"
+                        maxlength="10000"
+                        placeholder="통화 내용이나 작업 시 확인할 사항"
+                      ></textarea>
+                    </label>
+                  </div>
+                  <div class="work-sales-work-fields">
+                    <label for="work-sales-current-amount"
+                      ><span id="work-sales-current-label">올해 금액</span>
+                      <span class="work-sales-amount-input"
+                        ><input
+                          id="work-sales-current-amount"
+                          type="text"
+                          inputmode="decimal"
+                          maxlength="20"
+                        /><span>원</span></span
+                      ></label
+                    >
+                    <label for="work-sales-deadline"
+                      >작업 기한<input
+                        id="work-sales-deadline"
+                        type="text"
+                        maxlength="200"
+                        placeholder="예: 추석 전까지, 다음 주 중"
+                    /></label>
+                  </div>
+                </div>
+                <div class="work-sales-navigation">
+                  <div>
+                    <button id="work-sales-prev" class="work-secondary" type="button">
+                      이전 고객</button
+                    ><button id="work-sales-next" class="work-secondary" type="button">
+                      다음 고객
+                    </button>
+                  </div>
+                  <div class="work-sales-save-actions">
+                    <fieldset class="work-sales-result">
+                      <legend>전화 결과</legend>
+                      <label
+                        ><input
+                          id="work-sales-status-proceed"
+                          type="radio"
+                          name="sales-status"
+                          value="proceed"
+                          checked
+                        />진행</label
+                      >
+                      <label
+                        ><input
+                          id="work-sales-status-declined"
+                          type="radio"
+                          name="sales-status"
+                          value="declined"
+                        />미진행</label
+                      >
+                      <label
+                        ><input
+                          id="work-sales-status-uncontacted"
+                          type="radio"
+                          name="sales-status"
+                          value="uncontacted"
+                        />연락 X</label
+                      >
+                    </fieldset>
+                    <button id="work-sales-save-next" class="primary-button" type="submit">
+                      저장
+                    </button>
+                  </div>
+                </div>
+                <p id="work-sales-next-preview" class="work-note"></p>
+              </form>
+            </div>
+          </div>
+          <div id="work-manage-panel" role="tabpanel" aria-labelledby="work-tab-manage" hidden>
+            <div class="work-route-toolbar">
+              <div id="work-manage-regions"></div>
+              <button id="work-route-open" type="button" class="work-secondary">
+                작업 순서 설정
+              </button>
+            </div>
+            <input
+              id="work-manage-search"
+              class="work-manage-search"
+              type="search"
+              aria-label="작업 관리 검색"
+              placeholder="이름, 주소, 전화번호 검색"
+              autocomplete="off"
+            />
+            <div
+              id="work-manage-filters"
+              class="work-table-filters"
+              role="group"
+              aria-label="작업 관리 연락 결과"
+            >
+              <button type="button" data-manage-filter="all" aria-pressed="true">전체</button>
+              <button type="button" data-manage-filter="proceed" aria-pressed="false">진행</button>
+              <button type="button" data-manage-filter="declined" aria-pressed="false">
+                미진행
+              </button>
+              <button type="button" data-manage-filter="uncontacted" aria-pressed="false">
+                연락 X
+              </button>
+            </div>
+            <div class="work-table-scroll" tabindex="0" aria-label="작업 관리 표">
+              <table id="work-manage-grid" class="work-grid" aria-label="작업 관리 목록">
+                <thead></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="work-check-panel" role="tabpanel" aria-labelledby="work-tab-check" hidden>
+            <div id="work-check-regions"></div>
+            <div id="work-route-waiting" class="work-route-waiting" hidden>
+              <p id="work-route-waiting-title" role="status"></p>
+              <ul id="work-route-waiting-list"></ul>
+            </div>
+            <div class="work-check-bar">
+              <div
+                id="work-check-filters"
+                class="work-check-filters work-table-filters"
+                role="group"
+                aria-label="작업 확인 상태"
+              >
+                <button type="button" data-check-filter="all" aria-pressed="true">전체</button>
+                <button type="button" data-check-filter="sent" aria-pressed="false">
+                  문자 발송 완료
+                </button>
+                <button type="button" data-check-filter="paid" aria-pressed="false">
+                  입금 완료
+                </button>
+                <button type="button" data-check-filter="unpaid" aria-pressed="false">
+                  입금 미완료
+                </button>
+              </div>
+              <div id="work-route-summary" class="work-route-summary" hidden>
+                <p id="work-route-summary-text" class="visually-hidden" role="status"></p>
+                <div>
+                  <button id="work-route-view-map" type="button" class="work-secondary">
+                    전체 순서 지도
+                  </button>
+                  <button id="work-route-recalculate" type="button" class="work-secondary">
+                    다시 계산</button
+                  ><button
+                    id="work-route-delete"
+                    type="button"
+                    class="work-secondary"
+                    data-feature="delete"
+                  >
+                    순서 삭제
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              id="work-check-sheet-panel"
+              class="work-check-scroll work-table-scroll"
+              role="tabpanel"
+              tabindex="0"
+              aria-label="작업 확인 표"
+            >
+              <table id="work-check-grid" class="work-grid" aria-label="작업 확인 목록">
+                <thead></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div
+              id="work-check-sheets"
+              class="work-check-sheets"
+              role="tablist"
+              aria-label="작업 확인 지역"
+              hidden
+            ></div>
+          </div>
+          <dialog
+            id="route-order-dialog"
+            class="work-route-dialog route-order-dialog"
+            aria-labelledby="route-order-title"
+            aria-describedby="route-order-current"
+          >
+            <form id="route-order-form">
+              <h3 id="route-order-title">방문 순서 수정</h3>
+              <p id="route-order-customer"></p>
+              <p id="route-order-current"></p>
+              <label for="route-order-position">이동할 순서</label>
+              <input
+                id="route-order-position"
+                type="number"
+                min="1"
+                step="1"
+                inputmode="numeric"
+                required
+              />
+              <p id="route-order-preview" role="status"></p>
+              <p id="route-order-message" role="status"></p>
+              <footer class="work-route-actions">
+                <button
+                  id="route-order-exclude"
+                  type="button"
+                  class="work-secondary"
+                  data-feature="delete"
+                  hidden
+                >
+                  이 시트에서 빼기
+                </button>
+                <button id="route-order-close" type="button" class="work-secondary">취소</button
+                ><button id="route-order-save" type="submit" class="primary-button">
+                  순서 저장
+                </button>
+              </footer>
+            </form>
+          </dialog>
+          <dialog
+            id="route-overview-dialog"
+            class="work-route-dialog route-overview-dialog"
+            aria-labelledby="route-overview-title"
+          >
+            <header class="route-overview-toolbar">
+              <h3 id="route-overview-title">전체 순서 지도</h3>
+              <div>
+                <button id="route-overview-fit" type="button" class="work-secondary">
+                  전체 보기</button
+                ><button id="route-overview-retry" type="button" class="work-secondary">
+                  다시 연결</button
+                ><button id="route-overview-close" type="button" class="work-secondary">
+                  닫기
+                </button>
+              </div>
+            </header>
+            <p id="route-overview-status" role="status"></p>
+            <div class="route-overview-canvas">
+              <iframe
+                id="route-overview-frame"
+                title="구글 작업 순서 지도"
+                referrerpolicy="no-referrer"
+                hidden
+              ></iframe>
+            </div>
+            <div id="route-overview-insert" class="route-overview-insert" hidden>
+              <p id="route-overview-insert-work"></p>
+              <p id="route-overview-insert-at" role="status"></p>
+              <div>
+                <button id="route-overview-insert-manual" type="button" class="work-secondary">
+                  번호 직접 입력</button
+                ><button id="route-overview-insert-apply" type="button" class="primary-button">
+                  이 자리에 추가
+                </button>
+              </div>
+            </div>
+            <p id="route-overview-selection" role="status"></p>
+            <div id="route-overview-choices" class="work-route-actions"></div>
+          </dialog>
+          <dialog
+            id="work-route-dialog"
+            class="work-route-dialog"
+            aria-labelledby="work-route-title"
+            aria-describedby="work-route-help"
+          >
+            <h3 id="work-route-title">작업 순서 설정</h3>
+            <p id="work-route-help">
+              진행 작업의 지역과 시작 묘지를 선택하세요. 카카오 이동시간으로 방문 순서를 만듭니다.
+            </p>
+            <div id="work-route-regions"></div>
+            <div class="work-route-counts">
+              <strong id="work-route-count"></strong><span id="work-route-region-counts"></span>
+            </div>
+            <div class="work-route-start-toolbar">
+              <label for="work-route-search">시작 묘지 찾기</label>
+              <button
+                id="work-route-map-open"
+                type="button"
+                class="work-secondary"
+                aria-expanded="false"
+                aria-controls="work-route-map"
+              >
+                선택 지역 지도 보기
+              </button>
+            </div>
+            <div class="work-route-start-layout">
+              <div class="work-route-start-list">
+                <input
+                  id="work-route-search"
+                  type="search"
+                  placeholder="성함 또는 묘지 주소"
+                  autocomplete="off"
+                />
+                <label for="work-route-start">시작 묘지</label>
+                <select id="work-route-start" size="7" aria-describedby="work-route-count"></select>
+                <p id="work-route-selected-start" role="status" hidden></p>
+              </div>
+              <section id="work-route-map" aria-labelledby="work-route-map-title" hidden>
+                <h4 id="work-route-map-title">선택 지역 지도</h4>
+                <p class="work-route-note">
+                  핀을 더블클릭하면 시작 묘지로 선택됩니다. 진행 작업의 저장된 핀만 표시합니다.
+                </p>
+                <div class="work-route-map-canvas">
+                  <iframe
+                    id="work-route-map-frame"
+                    title="시작 묘지 선택 지도"
+                    sandbox="allow-scripts allow-same-origin"
+                    referrerpolicy="strict-origin"
+                    hidden
+                  ></iframe>
+                </div>
+                <p id="work-route-map-status" role="status" aria-live="polite"></p>
+                <div
+                  id="work-route-map-choices"
+                  aria-label="같은 위치의 시작 묘지 선택"
+                  hidden
+                ></div>
+                <details id="work-route-map-missing" hidden>
+                  <summary id="work-route-map-missing-count"></summary>
+                  <ul id="work-route-map-missing-list"></ul>
+                </details>
+              </section>
+            </div>
+            <p id="work-route-estimate" class="work-route-note"></p>
+            <p id="work-route-message" role="status" aria-live="polite"></p>
+            <progress id="work-route-progress" aria-label="작업 순서 계산 진행" hidden></progress>
+            <div class="work-route-actions">
+              <button id="work-route-cancel" type="button" class="work-secondary">닫기</button
+              ><button id="work-route-generate" type="button" class="primary-button" disabled>
+                순서 만들기
+              </button>
+            </div>
+          </dialog>
+          <dialog
+            id="work-unsaved-dialog"
+            class="work-unsaved-dialog"
+            aria-labelledby="work-unsaved-title"
+          >
+            <h3 id="work-unsaved-title">저장하지 않은 입력이 있습니다</h3>
+            <div>
+              <button id="work-unsaved-cancel" class="work-secondary" type="button" autofocus>
+                계속 입력</button
+              ><button id="work-unsaved-discard" class="work-secondary" type="button">
+                입력 버리고 이동
+              </button>
+            </div>
+          </dialog>
+          <dialog
+            id="work-allocation-dialog"
+            class="work-unsaved-dialog"
+            aria-labelledby="work-allocation-title"
+            aria-describedby="work-allocation-sheet"
+          >
+            <h3 id="work-allocation-title">배정 변경</h3>
+            <p id="work-allocation-sheet"></p>
+            <fieldset class="work-allocation-members">
+              <legend class="visually-hidden">작업자 계정</legend>
+              <div id="work-allocation-members"></div>
+            </fieldset>
+            <p id="work-allocation-status" class="work-status" role="status" aria-live="polite"></p>
+            <div>
+              <button id="work-allocation-cancel" class="work-secondary" type="button">취소</button
+              ><button id="work-allocation-confirm" class="primary-button" type="button">
+                변경 저장
+              </button>
+            </div>
+          </dialog>
+        </section>
+        <!-- map-view:start -->
+        <section id="map-page" aria-label="묘지 지도" hidden>
+          <div id="map-view-panel">
+            <div class="map-filters">
+              <div class="map-region-row">
+                <div id="map-region-picker" class="map-region-picker">
+                  <button
+                    id="map-region-toggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="map-region-panel"
+                  >
+                    <span>지역 선택</span
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      aria-hidden="true"
+                    >
+                      <path d="m8 5 7 7-7 7" />
+                    </svg>
+                  </button>
+                  <div id="map-region-panel" class="map-region-panel" hidden>
+                    <label class="map-region-search-label" for="map-region-search"
+                      >지역 선택
+                      <input
+                        id="map-region-search"
+                        type="search"
+                        placeholder="지역 검색"
+                        aria-label="지역 검색"
+                        aria-controls="map-region-options"
+                        autocomplete="off"
+                        maxlength="50"
+                      />
+                    </label>
+                    <div
+                      id="map-region-options"
+                      class="map-region-options"
+                      aria-label="지도 시·군 선택"
+                    ></div>
+                    <p id="map-region-empty" role="status" hidden>검색 결과가 없습니다.</p>
+                  </div>
+                </div>
+                <div id="map-regions" class="map-regions" aria-label="선택한 지역"></div>
+                <span id="map-region-all" class="map-region-all">전체 지역</span>
+                <div id="map-search-box" class="map-search-box">
+                  <div class="map-search-input">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      aria-hidden="true"
+                    >
+                      <circle cx="10.5" cy="10.5" r="6.5" />
+                      <path d="m16 16 4.5 4.5" />
+                    </svg>
+                    <input
+                      id="map-search"
+                      type="search"
+                      maxlength="200"
+                      autocomplete="off"
+                      aria-label="지역, 이름, 전화번호, 주소 검색"
+                      placeholder="지역, 이름, 전화번호, 주소 검색"
+                      aria-controls="map-search-panel"
+                      aria-expanded="false"
+                    />
+                    <button id="map-search-clear" type="button" aria-label="검색어 지우기" hidden>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                      >
+                        <path d="m7 7 10 10M17 7 7 17" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div id="map-search-panel" class="map-search-panel" hidden>
+                    <p id="map-search-summary" role="status"></p>
+                    <div
+                      id="map-search-results"
+                      class="map-search-results"
+                      aria-label="위치 검색 결과"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="map-status-row">
+              <p id="map-status" class="map-status" role="status" aria-live="polite"></p>
+            </div>
+            <details id="map-unresolved" class="map-unresolved" hidden>
+              <summary id="map-unresolved-summary">주소 확인 필요</summary>
+              <div id="map-unresolved-list"></div>
+            </details>
+            <div class="map-workspace">
+              <div class="map-canvas">
+                <iframe
+                  id="map-frame"
+                  title="구글 묘지 지도"
+                  sandbox="allow-scripts allow-same-origin"
+                  hidden
+                ></iframe>
+                <div id="map-placeholder" class="map-placeholder">
+                  <span data-icon="map"></span>
+                  <h2>묘지 지도</h2>
+                  <p id="map-placeholder-copy">지도 연결 중…</p>
+                </div>
+              </div>
+              <section id="map-detail" class="map-detail" aria-label="선택한 묘지" hidden>
+                <button id="map-detail-close" class="text-button">상세 닫기</button>
+                <h2 id="map-name"></h2>
+                <p id="map-address"></p>
+                <dl id="map-detail-fields"></dl>
+                <div id="map-overlap" hidden></div>
+                <details class="map-correction">
+                  <summary>위치 보정</summary>
+                  <form id="map-location-form">
+                    <label
+                      >검색용 주소<input
+                        id="map-lookup-address"
+                        maxlength="500"
+                        placeholder="시·군·구부터 지번까지 입력"
+                    /></label>
+
+                    <fieldset>
+                      <legend>저장된 좌표</legend>
+                      <label
+                        >위도<input
+                          id="map-lat"
+                          type="number"
+                          min="-90"
+                          max="90"
+                          step="any"
+                          placeholder="예: 37.123456" /></label
+                      ><label
+                        >경도<input
+                          id="map-lng"
+                          type="number"
+                          min="-180"
+                          max="180"
+                          step="any"
+                          placeholder="예: 127.123456"
+                      /></label>
+                    </fieldset>
+                    <p class="map-note">좌표를 해제하려면 위도·경도를 모두 비워 저장하세요.</p>
+                    <button id="map-save-location" class="primary-button" type="submit">
+                      위치 정보 저장
+                    </button>
+                  </form>
+                </details>
+              </section>
+            </div>
+            <div class="map-footer" aria-label="지도 도구">
+              <button id="map-popout" type="button">새 창으로 보기</button>
+              <span class="map-footer-divider" aria-hidden="true">/</span>
+              <button id="map-reload" type="button">지도 새로고침</button>
+            </div>
+          </div>
+        </section>
+        <!-- map-view:end -->
+      </main>
+    </div>
+    <dialog
+      id="work-detail"
+      class="customer-detail work-detail"
+      aria-labelledby="work-detail-title"
+    >
+      <form id="work-detail-form">
+        <header class="detail-header">
+          <h2 id="work-detail-title">작업 상세 정보</h2>
+          <button id="work-detail-close" class="detail-close" type="button" aria-label="닫기">
+            <span data-icon="close"></span>
+          </button>
+        </header>
+        <div id="work-detail-body" class="detail-body" hidden>
+          <h3 id="work-detail-name"></h3>
+          <p id="work-detail-address" class="work-detail-address"></p>
+          <dl class="detail-view-fields work-detail-fields">
+            <div>
+              <dt>연락처</dt>
+              <dd id="work-detail-phone"></dd>
+            </div>
+            <div>
+              <dt>기수</dt>
+              <dd id="work-detail-gisu"></dd>
+            </div>
+            <div>
+              <dt>등록</dt>
+              <dd>
+                <select
+                  id="work-detail-status-select"
+                  class="inline-value"
+                  aria-label="등록 결과"
+                  disabled
+                >
+                  <option value="uncontacted">연락 X</option>
+                  <option value="proceed">진행</option>
+                  <option value="declined">미진행</option>
+                </select>
+              </dd>
+            </div>
+            <div>
+              <dt id="work-detail-amount-label">이번년도 금액</dt>
+              <dd>
+                <input
+                  id="work-detail-current-amount"
+                  class="inline-value"
+                  type="text"
+                  inputmode="numeric"
+                  aria-label="이번년도 금액"
+                  maxlength="30"
+                  placeholder="—"
+                  readonly
+                />
+              </dd>
+            </div>
+            <div class="work-detail-full">
+              <dt>고객 요구사항</dt>
+              <dd>
+                <textarea
+                  id="work-detail-requirements"
+                  class="inline-value"
+                  rows="1"
+                  maxlength="10000"
+                  aria-label="고객 요구사항"
+                  placeholder="—"
+                  readonly
+                ></textarea>
+              </dd>
+            </div>
+            <div class="work-detail-full">
+              <dt>특이사항</dt>
+              <dd>
+                <textarea
+                  id="work-detail-notes"
+                  class="inline-value"
+                  rows="1"
+                  maxlength="10000"
+                  aria-label="특이사항"
+                  placeholder="—"
+                  readonly
+                ></textarea>
+              </dd>
+            </div>
+            <div class="work-detail-full">
+              <dt>작업 기한</dt>
+              <dd>
+                <textarea
+                  id="work-detail-deadline"
+                  class="inline-value"
+                  rows="1"
+                  maxlength="200"
+                  aria-label="작업 기한"
+                  placeholder="—"
+                  readonly
+                ></textarea>
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <footer class="detail-footer">
+          <p id="work-detail-message" role="status"></p>
+          <button
+            id="work-detail-delete"
+            class="secondary-button"
+            type="button"
+            data-feature="delete"
+            hidden
+          >
+            삭제
+          </button>
+          <button id="work-detail-cancel" class="secondary-button" type="button">닫기</button>
+          <button id="work-detail-edit" class="primary-button" type="button" hidden>
+            수정하기
+          </button>
+          <button id="work-detail-save" class="primary-button" type="submit" hidden>저장</button>
+        </footer>
+      </form>
+    </dialog>
+    <dialog
+      id="review-dialog"
+      class="customer-detail review-dialog"
+      aria-labelledby="review-dialog-title"
+    >
+      <header class="detail-header">
+        <h2 id="review-dialog-title">등록 요청 검토</h2>
+        <button id="review-dialog-close" type="button" class="detail-close" aria-label="닫기">
+          <span data-icon="close"></span>
+        </button>
+      </header>
+      <div class="detail-body">
+        <p id="review-dialog-meta" class="review-dialog-meta"></p>
+        <dl id="review-dialog-fields" class="detail-view-fields review-dialog-fields"></dl>
+        <form id="review-edit" class="review-edit" autocomplete="off" hidden>
+          <fieldset class="register-grid" aria-label="요청 내용 수정">
+            <div class="register-wide register-address-row">
+              <span id="review-edit-address-label">묘지위치</span>
+              <div
+                class="register-address-fields"
+                role="group"
+                aria-labelledby="review-edit-address-label"
+              >
+                <div class="register-address-regions">
+                  <select id="review-edit-province" aria-label="시·도">
+                    <option value="">시·도 선택</option>
+                  </select>
+                  <select id="review-edit-city" aria-label="시·군·구" disabled>
+                    <option value="">시·군·구 선택</option>
+                  </select>
+                </div>
+                <input
+                  id="review-edit-detail"
+                  type="text"
+                  maxlength="500"
+                  aria-label="상세주소"
+                  placeholder="읍·면·동, 지번 또는 도로명 주소"
+                />
+              </div>
+            </div>
+            <label class="management-toggle register-wide">
+              <input name="isManaged" type="checkbox" />꾸준히 관리하는 묘지
+            </label>
+            <label>기수<input name="gisu" type="text" maxlength="10000" placeholder="—" /></label>
+            <label
+              >평수<input
+                name="pyeong"
+                type="text"
+                inputmode="decimal"
+                maxlength="10000"
+                placeholder="—"
+            /></label>
+            <label>이름<input name="name" type="text" maxlength="10000" placeholder="—" /></label>
+            <label
+              >전화번호<input name="phone" type="tel" maxlength="10000" placeholder="—"
+            /></label>
+            <label
+              >금액 (원)<input
+                name="amount"
+                type="text"
+                inputmode="numeric"
+                maxlength="10000"
+                placeholder="—"
+            /></label>
+            <label class="register-wide"
+              >고객 요구사항<textarea
+                name="requirements"
+                rows="3"
+                maxlength="10000"
+                placeholder="—"
+              ></textarea>
+            </label>
+            <label class="register-wide"
+              >특이사항<textarea
+                name="specialNotes"
+                rows="3"
+                maxlength="10000"
+                placeholder="—"
+              ></textarea>
+            </label>
+          </fieldset>
+        </form>
+        <section class="review-dialog-location" aria-label="위치">
+          <h3>위치</h3>
+          <p id="review-dialog-location"></p>
+          <button
+            id="review-dialog-shot"
+            type="button"
+            class="review-shot-thumb"
+            title="누르면 크게 봅니다"
+            hidden
+          >
+            <img id="review-dialog-shot-img" alt="요청에 담긴 위치 스크린샷" />
+          </button>
+          <p id="review-dialog-shot-none" class="detail-note" hidden>스크린샷 없음</p>
+        </section>
+      </div>
+      <footer class="detail-footer">
+        <p id="review-dialog-status" role="status"></p>
+        <button
+          id="review-dialog-reject"
+          type="button"
+          class="secondary-button"
+          data-feature="delete"
+        >
+          반려
+        </button>
+        <button id="review-dialog-edit" type="button" class="secondary-button">수정</button>
+        <button id="review-dialog-approve" type="button" class="primary-button">승인</button>
+      </footer>
+    </dialog>
+    <dialog id="detail-shot-viewer" aria-label="위치 스크린샷 크게 보기">
+      <div class="report-photo-viewer-bar">
+        <span id="detail-shot-title">위치 스크린샷</span
+        ><button id="detail-shot-close" type="button" class="secondary-button">닫기</button>
+      </div>
+      <img id="detail-shot-large" alt="이 묘지에 저장된 위치 스크린샷" />
+    </dialog>
+    <dialog id="review-shot-viewer" aria-label="스크린샷 크게 보기">
+      <div class="report-photo-viewer-bar">
+        <span>위치 스크린샷</span
+        ><button id="review-shot-close" type="button" class="secondary-button">닫기</button>
+      </div>
+      <img id="review-shot-large" alt="요청에 담긴 위치 스크린샷" />
+    </dialog>
+    <dialog id="customer-detail" class="customer-detail" aria-labelledby="customer-detail-title">
+      <form id="customer-detail-form">
+        <header class="detail-header">
+          <h2 id="customer-detail-title">고객 상세 정보</h2>
+          <button id="detail-close" type="button" class="detail-close" aria-label="닫기">
+            <span data-icon="close"></span>
+          </button>
+        </header>
+        <div class="detail-body">
+          <fieldset id="detail-fields" hidden>
+            <section id="detail-overview" aria-label="고객 정보">
+              <h3 id="detail-view-name"></h3>
+              <div id="detail-view-address"></div>
+              <button id="detail-map" type="button" class="secondary-button" hidden>
+                지도에서 위치 보기
+              </button>
+              <section
+                id="detail-earth-section"
+                class="earth-location-section"
+                aria-label="어스 위치"
+                hidden
+              >
+                <div class="earth-location-actions">
+                  <span class="earth-location-label"
+                    >어스 위치
+                    <strong id="detail-grave-code" class="earth-grave-code" hidden></strong
+                  ></span>
+                  <button id="detail-grave-code-copy" type="button" class="secondary-button" hidden>
+                    코드 복사
+                  </button>
+                  <button id="detail-earth-shot" type="button" class="secondary-button" hidden>
+                    스크린샷 보기
+                  </button>
+                  <button id="detail-earth-download" type="button" class="secondary-button" hidden>
+                    현재 원본 열기
+                  </button>
+                  <button
+                    id="detail-earth-import"
+                    type="button"
+                    class="secondary-button"
+                    data-feature="customer-edit"
+                    hidden
+                  >
+                    어스 위치 가져오기
+                  </button>
+                </div>
+                <p id="detail-earth-summary" class="earth-location-summary" role="status"></p>
+              </section>
+              <dl id="detail-view-fields" class="detail-view-fields"></dl>
+              <dl
+                id="detail-view-payments"
+                class="detail-view-payments"
+                aria-label="연도별 금액"
+              ></dl>
+            </section>
+          </fieldset>
+          <p id="detail-shared" class="detail-note" hidden>
+            이름·전화번호·고객 요구사항은 같은 고객의 모든 묘지에 반영됩니다.
+          </p>
+          <section
+            id="detail-photo-section"
+            class="detail-photo-section"
+            aria-label="작업 사진"
+            hidden
+          >
+            <h3>작업 사진</h3>
+            <p id="detail-photo-status" class="detail-note" role="status"></p>
+            <div id="detail-photos"></div>
+            <button id="detail-photo-more" type="button" class="secondary-button" hidden>
+              이전 작업 사진 더 보기
+            </button>
+          </section>
+        </div>
+        <footer class="detail-footer">
+          <p id="detail-status" role="status"></p>
+          <button
+            id="detail-permanent-delete"
+            type="button"
+            class="secondary-button"
+            data-feature="delete"
+            hidden
+          >
+            영구 삭제
+          </button>
+          <button
+            id="detail-archive"
+            type="button"
+            class="secondary-button"
+            data-feature="delete"
+            hidden
+          >
+            삭제
+          </button>
+          <button id="detail-cancel" type="button" class="secondary-button">닫기</button>
+          <button id="detail-edit" type="button" class="primary-button" hidden>수정하기</button>
+          <button id="detail-save" type="submit" class="primary-button" disabled hidden>
+            저장
+          </button>
+        </footer>
+      </form>
+    </dialog>
+    <dialog
+      id="earth-import-dialog"
+      class="customer-detail earth-import-dialog"
+      aria-label="어스 위치 가져오기"
+    >
+      <header class="detail-header">
+        <button id="earth-close" type="button" class="detail-close" aria-label="닫기">×</button>
+      </header>
+      <div class="detail-body earth-import-body">
+        <label class="earth-address-field" for="earth-final-address">
+          어스 검색 주소
+          <textarea
+            id="earth-final-address"
+            rows="2"
+            maxlength="1000"
+            spellcheck="false"
+          ></textarea>
+        </label>
+        <div id="earth-code" class="earth-code" hidden>
+          <span>묘지 코드</span>
+          <strong id="earth-code-text"></strong>
+          <button id="earth-code-copy" type="button" class="secondary-button">복사</button>
+        </div>
+        <div id="earth-auto-folder" hidden>
+          <div class="earth-file-actions">
+            <button id="earth-search" type="button" class="secondary-button">
+              구글 어스로 찾기
+            </button>
+          </div>
+        </div>
+        <div class="earth-file-actions">
+          <button id="earth-file-choose" type="button" class="secondary-button">
+            KML·KMZ 파일 선택
+          </button>
+          <button id="earth-file-reread" type="button" class="secondary-button" disabled>
+            다시 읽기
+          </button>
+        </div>
+        <div id="earth-watching" class="earth-watching" hidden>
+          <span id="earth-watching-text"></span>
+          <button id="earth-folder-open" type="button" class="secondary-button">폴더 열기</button>
+        </div>
+        <p id="earth-file-name" hidden></p>
+        <section id="earth-shot" class="earth-shot" hidden aria-label="위치 스크린샷">
+          <h3>스크린샷 <small id="earth-shot-need">(선택)</small></h3>
+          <div
+            id="earth-shot-zone"
+            class="earth-shot-zone"
+            tabindex="0"
+            role="button"
+            aria-describedby="earth-shot-hint"
+          >
+            캡처한 뒤 여기를 누르고 Ctrl+V (Mac은 ⌘V)로 붙여넣기
+          </div>
+          <p id="earth-shot-hint" class="earth-shot-hint">
+            화면 맨 아래 검은 띠(Google · 데이터 저작자 표시 · 날짜)가 보이게 캡처해 주세요. 그 띠는
+            자르지 않고 보관합니다.
+          </p>
+          <figure id="earth-shot-figure" class="earth-shot-figure" hidden>
+            <img id="earth-shot-preview" alt="붙여넣은 위치 스크린샷" />
+            <figcaption id="earth-shot-caption">
+              Google Earth 화면 캡처 · 출처는 이미지 하단 표시 기준
+            </figcaption>
+            <div class="earth-shot-actions">
+              <span id="earth-shot-info"></span>
+              <button id="earth-shot-clear" type="button" class="secondary-button">지우기</button>
+            </div>
+          </figure>
+        </section>
+        <dl class="earth-metrics">
+          <div>
+            <dt>대표 좌표</dt>
+            <dd id="earth-coordinates">—</dd>
+          </div>
+          <div>
+            <dt>계산 면적 · 근사값</dt>
+            <dd id="earth-area">—</dd>
+          </div>
+        </dl>
+        <p id="earth-status" class="earth-status" role="status" aria-live="polite" hidden></p>
+      </div>
+      <footer class="detail-footer">
+        <button id="earth-cancel" type="button" class="secondary-button">취소</button>
+        <button id="earth-apply" type="button" class="primary-button" disabled>적용</button>
+      </footer>
+    </dialog>
+    <dialog id="excel-preview" class="excel-preview" aria-labelledby="excel-preview-title">
+      <header class="excel-preview-header">
+        <div>
+          <h2 id="excel-preview-title">지역별 고객</h2>
+          <span id="excel-dirty"></span>
+        </div>
+        <button id="excel-preview-close" type="button" aria-label="엑셀 화면 닫기">×</button>
+      </header>
+      <div class="excel-toolbar" role="toolbar" aria-label="엑셀 편집 도구">
+        <button id="excel-save" class="excel-save" type="button" data-feature="customer-edit">
+          DB 저장
+        </button>
+        <button id="excel-download" type="button">다운로드</button>
+        <span class="excel-toolbar-separator"></span>
+        <button id="excel-undo" type="button" aria-label="실행 취소" title="실행 취소 (Ctrl+Z)">
+          ↶
+        </button>
+        <button
+          id="excel-redo"
+          type="button"
+          aria-label="다시 실행"
+          title="다시 실행 (Ctrl+Shift+Z)"
+        >
+          ↷
+        </button>
+        <span class="excel-toolbar-caption">지역별 고객 목록</span>
+      </div>
+      <div class="excel-formula-bar">
+        <output id="excel-cell-reference" aria-label="선택한 셀">—</output
+        ><span aria-hidden="true">fx</span>
+        <textarea
+          id="excel-cell-value"
+          rows="1"
+          aria-label="선택한 셀 값"
+          autocomplete="off"
+          disabled
+        ></textarea>
+      </div>
+      <div
+        id="excel-grid-scroll"
+        class="excel-grid-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="편집 가능한 고객 시트"
+      >
+        <table id="excel-grid" aria-label="지역별 고객 편집">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <nav id="excel-sheets" class="excel-sheets" aria-label="지역별 시트" role="tablist"></nav>
+      <footer class="excel-statusbar">
+        <span id="excel-preview-status" role="status"></span><span id="excel-sheet-count"></span>
+      </footer>
+    </dialog>
+    <dialog id="sales-ended-dialog" class="work-unsaved-dialog" aria-labelledby="sales-ended-title">
+      <h3 id="sales-ended-title">통화를 종료했나요?</h3>
+      <p>
+        다른 고객으로 이동하면 현재 고객의 배정이 해제됩니다. 저장하지 않은 입력도 확인해주세요.
+      </p>
+      <footer>
+        <button id="sales-ended-cancel" class="work-secondary" type="button">취소</button
+        ><button id="sales-ended-discard" class="work-secondary" type="button">
+          입력 버리고 이동</button
+        ><button id="sales-ended-save" class="primary-button" type="button">저장하고 이동</button>
+      </footer>
+    </dialog>
+    <dialog id="sales-review-dialog" class="work-unsaved-dialog" aria-label="확인 필요한 영업 배정">
+      <h3>확인 필요한 영업 배정</h3>
+      <p>통화가 이어지고 있는지 확인한 뒤 해제해주세요.</p>
+      <ul id="sales-review-list"></ul>
+      <footer>
+        <button id="sales-review-close" class="work-secondary" type="button">닫기</button>
+      </footer>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <dialog
+      id="billing-dialog"
+      class="customer-detail billing-dialog"
+      aria-labelledby="billing-dialog-title"
+    >
+      <header class="detail-header">
+        <div class="billing-dialog-heading">
+          <p id="billing-dialog-sub" class="billing-muted"></p>
+          <h2 id="billing-dialog-title">청구서</h2>
+        </div>
+        <button id="billing-dialog-close" type="button" class="detail-close" aria-label="닫기">
+          <span data-icon="close"></span>
+        </button>
+      </header>
+      <div class="detail-body">
+        <p id="billing-dialog-status" role="status" aria-live="polite"></p>
+        <dl id="billing-boxes" class="billing-boxes"></dl>
+        <p id="billing-memo" class="billing-memo" hidden></p>
+        <section class="billing-section" aria-labelledby="billing-photos-title">
+          <h3 id="billing-photos-title">작업 사진</h3>
+          <div id="billing-reports"></div>
+        </section>
+        <section class="billing-section" aria-labelledby="billing-message-title">
+          <h3 id="billing-message-title">청구 문자</h3>
+          <p id="billing-message"></p>
+        </section>
+        <form id="billing-pay" class="billing-section billing-pay" autocomplete="off" hidden>
+          <h3>입금 직접 확인</h3>
+          <div class="billing-pay-fields">
+            <label class="page-field"
+              >받은 날 <input id="billing-pay-date" type="date" required
+            /></label>
+            <label class="page-field"
+              >입금자 이름 <input id="billing-pay-name" type="text" maxlength="50" required
+            /></label>
+            <button
+              id="billing-pay-submit"
+              type="submit"
+              class="primary-button"
+              data-feature="billing"
+            >
+              입금 확인
+            </button>
+          </div>
+        </form>
+      </div>
+      <footer class="detail-footer">
+        <p
+          id="billing-action-status"
+          class="billing-pick-note"
+          role="status"
+          aria-live="polite"
+        ></p>
+        <button
+          id="billing-unpay"
+          type="button"
+          class="secondary-button"
+          data-feature="delete"
+          hidden
+        >
+          입금 취소
+        </button>
+        <button
+          id="billing-delete"
+          type="button"
+          class="secondary-button billing-danger"
+          data-feature="delete"
+        >
+          청구서 삭제
+        </button>
+      </footer>
+    </dialog>
+    <dialog
+      id="billing-pick-dialog"
+      class="customer-detail billing-dialog"
+      aria-labelledby="billing-pick-title"
+    >
+      <header class="detail-header">
+        <div class="billing-dialog-heading">
+          <p class="billing-muted">확인 대기 입금</p>
+          <h2 id="billing-pick-title">이 입금은 어느 청구서인가요?</h2>
+        </div>
+        <button id="billing-pick-close" type="button" class="detail-close" aria-label="닫기">
+          <span data-icon="close"></span>
+        </button>
+      </header>
+      <div class="detail-body">
+        <div id="billing-pick-deposit" class="billing-deposit"></div>
+        <div
+          id="billing-pick-tabs"
+          class="tabs billing-pick-tabs"
+          role="tablist"
+          aria-label="후보 청구서 보기"
+        >
+          <button
+            type="button"
+            role="tab"
+            data-pick-tab="both"
+            aria-selected="false"
+            aria-controls="billing-pick-panel"
+            hidden
+          >
+            이름·금액 같음 <span data-count></span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-pick-tab="payer"
+            aria-selected="false"
+            aria-controls="billing-pick-panel"
+          >
+            다른 입금자명 <span data-count></span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-pick-tab="name"
+            aria-selected="false"
+            aria-controls="billing-pick-panel"
+          >
+            이름만 같음 <span data-count></span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-pick-tab="amount"
+            aria-selected="false"
+            aria-controls="billing-pick-panel"
+          >
+            금액만 같음 <span data-count></span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-pick-tab="search"
+            aria-selected="false"
+            aria-controls="billing-pick-panel"
+          >
+            진행 작업에서 찾기
+          </button>
+        </div>
+        <div id="billing-pick-panel" class="billing-pick-panel" role="tabpanel">
+          <div id="billing-pick-find" class="billing-pick-find" hidden>
+            <label class="billing-year"
+              >시트
+              <select id="billing-pick-sheet">
+                <option value="">전체 진행 작업</option>
+              </select>
+            </label>
+            <input
+              id="billing-pick-search"
+              type="search"
+              placeholder="고객 이름 · 묘지 번호 · 주소"
+              aria-label="진행 작업 검색"
+            />
+          </div>
+          <div id="billing-pick-groups" role="group" aria-label="후보 청구서"></div>
+        </div>
+        <p id="billing-pick-chosen" class="billing-pick-chosen"></p>
+        <label id="billing-pick-remember" class="billing-remember" hidden>
+          <input id="billing-pick-remember-check" type="checkbox" checked />
+          <span>
+            <span id="billing-pick-remember-text"></span>
+          </span>
+        </label>
+        <p id="billing-pick-known" class="billing-note" hidden></p>
+      </div>
+      <footer class="detail-footer">
+        <p id="billing-pick-status" class="billing-pick-note" role="status" aria-live="polite"></p>
+        <button
+          id="billing-pick-ignore"
+          type="button"
+          class="secondary-button"
+          data-feature="billing"
+        >
+          회사 입금 아님 (빼기)
+        </button>
+        <button
+          id="billing-pick-confirm"
+          type="button"
+          class="primary-button"
+          data-feature="billing"
+        >
+          입금 확인
+        </button>
+      </footer>
+    </dialog>
+    <dialog id="report-photo-viewer" aria-label="작업 사진 크게 보기">
+      <div class="report-photo-viewer-bar">
+        <span id="report-photo-caption"></span
+        ><button id="report-photo-close" class="secondary-button">닫기</button>
+      </div>
+      <img id="report-photo-large" alt="" />
+    </dialog>
+    <datalist id="business-region-options">
+      <option value="경기 북부"></option>
+      <option value="경기 서부"></option>
+      <option value="경기 동부"></option>
+    </datalist>
+  </body>
+</html>

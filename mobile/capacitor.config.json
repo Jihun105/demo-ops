@@ -1,0 +1,7 @@
+{
+  "appId": "kr.demo.field",
+  "appName": "데모 업무",
+  "webDir": "dist",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false }
+}

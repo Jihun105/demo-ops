@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' 'unsafe-eval' https://dapi.kakao.com https://*.daumcdn.net https://*.kakaocdn.net https://*.daum.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.daumcdn.net https://*.kakaocdn.net https://*.daum.net https://*.kakao.com; connect-src 'self' https://dapi.kakao.com https://*.daumcdn.net https://*.kakaocdn.net https://*.daum.net; font-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests"
+    />
+    <link rel="stylesheet" href="map-frame.css" />
+    <script src="map-bootstrap.js" defer></script>
+    <script src="map-boundaries.js" defer></script>
+    <script src="map-renderer.js" defer></script>
+    <title>묘지 지도</title>
+  </head>
+  <body>
+    <div id="map" aria-label="카카오 묘지 지도"></div>
+    <div id="status">지도를 연결하고 있습니다.</div>
+  </body>
+</html>

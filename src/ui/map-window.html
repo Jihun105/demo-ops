@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; frame-src http://127.0.0.1:8092; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>묘지 지도 · (주)데모</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="map.css" />
+    <script src="model.js" defer></script>
+    <script src="map.js" defer></script>
+    <script src="map-window.js" defer></script>
+    <script src="tab-indicator.js" defer></script>
+  </head>
+  <body class="detached-map">
+    <main><!-- MAP_CONTENT --></main>
+  </body>
+</html>

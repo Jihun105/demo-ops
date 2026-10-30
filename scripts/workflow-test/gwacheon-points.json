@@ -1,0 +1,142 @@
+[
+  {
+    "address": "경기도 과천시 관문동 72-27",
+    "lat": 37.44,
+    "lng": 126.994,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 240
+  },
+  {
+    "address": "경기도 과천시 중앙동 73",
+    "lat": 37.435,
+    "lng": 126.992,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 239
+  },
+  {
+    "address": "경기도 과천시 중앙동 57",
+    "lat": 37.433,
+    "lng": 126.993,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 238
+  },
+  {
+    "address": "경기도 과천시 중앙동 47",
+    "lat": 37.433,
+    "lng": 126.991,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 237
+  },
+  {
+    "address": "경기도 과천시 중앙동 28-1",
+    "lat": 37.432,
+    "lng": 126.99,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 236
+  },
+  {
+    "address": "경기도 과천시 중앙동 50",
+    "lat": 37.432,
+    "lng": 126.989,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 235
+  },
+  {
+    "address": "경기도 과천시 중앙동 58",
+    "lat": 37.429,
+    "lng": 126.992,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 233
+  },
+  {
+    "address": "경기도 과천시 문원동 142",
+    "lat": 37.425,
+    "lng": 127.008,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 231
+  },
+  {
+    "address": "경기도 과천시 문원동 115-93",
+    "lat": 37.424,
+    "lng": 127.008,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 230
+  },
+  {
+    "address": "경기도 과천시 문원동 115-33",
+    "lat": 37.425,
+    "lng": 127.01,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 229
+  },
+  {
+    "address": "경기도 과천시 문원동 115-40",
+    "lat": 37.425,
+    "lng": 127.01119,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 228
+  },
+  {
+    "address": "경기도 과천시 문원동 115-233",
+    "lat": 37.424,
+    "lng": 127.011,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 226
+  },
+  {
+    "address": "경기도 과천시 문원동 115-419",
+    "lat": 37.422,
+    "lng": 127.011,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 224
+  },
+  {
+    "address": "경기도 과천시 문원동 115-355",
+    "lat": 37.422,
+    "lng": 127.01,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 223
+  },
+  {
+    "address": "경기도 과천시 문원동 115-351",
+    "lat": 37.422,
+    "lng": 127.009,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 221
+  },
+  {
+    "address": "경기도 과천시 문원동 150-8",
+    "lat": 37.423,
+    "lng": 127.009,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 220
+  },
+  {
+    "address": "경기도 과천시 문원동 303",
+    "lat": 37.423415,
+    "lng": 126.999,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 219
+  },
+  {
+    "address": "경기도 과천시 문원동 1034-1",
+    "lat": 37.425201,
+    "lng": 127,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 218
+  },
+  {
+    "address": "경기도 과천시 문원동 31-1",
+    "lat": 37.42879,
+    "lng": 127.003,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 217
+  },
+  {
+    "address": "경기도 과천시 문원로 40",
+    "lat": 37.429,
+    "lng": 127.002,
+    "source": "https://www.gccity.go.kr/dept/snowBox/list.do?mId=0707000000",
+    "sourceId": 216
+  }
+]

@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#171719" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' data: https://*.supabase.co wss://*.supabase.co https://*.r2.cloudflarestorage.com; frame-src 'self' http://127.0.0.1:8092; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>데모 · 현장 업무</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body data-session="locked">
+    <header class="app-header">
+      <div class="wordmark">
+        <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M8 31C6 13 18 7 31 5c0 17-9 25-23 26Z" />
+          <path class="brand-stem" d="M9 40V26" />
+          <path d="M13 35c8-11 23-7 30 1-9 9-19 9-30-1Z" />
+          <path class="brand-fold" d="m17 36 8-2 10 4" />
+        </svg>
+        데모<span>현장 업무</span>
+      </div>
+    </header>
+    <div class="connection-line">
+      <span id="catalog-state">자료 확인 중</span><span id="sync-state">연결 안 됨</span>
+    </div>
+    <main>
+      <section id="login-screen" class="screen login-screen">
+        <div class="login-brand" aria-hidden="true">
+          <svg class="brand-mark" viewBox="0 0 48 48">
+            <path d="M8 31C6 13 18 7 31 5c0 17-9 25-23 26Z" />
+            <path class="brand-stem" d="M9 40V26" />
+            <path d="M13 35c8-11 23-7 30 1-9 9-19 9-30-1Z" />
+            <path class="brand-fold" d="m17 36 8-2 10 4" />
+          </svg>
+        </div>
+        <div class="heading">
+          <h1>데모 로그인</h1>
+        </div>
+        <p id="login-status" class="section-note" role="status"></p>
+        <button id="restore-login" class="text-button" hidden>저장된 로그인 다시 확인</button>
+        <div id="login-content"></div>
+      </section>
+      <section id="search-screen" class="screen" hidden>
+        <div class="heading">
+          <h1>고객 찾기</h1>
+        </div>
+        <form id="search-form" class="search">
+          <label class="sr-only" for="query">위치·고객 검색</label
+          ><input
+            id="query"
+            type="search"
+            placeholder="주소, 번호, 고객 이름"
+            autocomplete="off"
+          /><button type="submit">검색</button>
+        </form>
+        <div id="data-empty" class="empty" hidden>
+          <h2>동기화된 자료가 없습니다</h2>
+          <button class="primary" id="empty-settings">설정</button>
+        </div>
+        <p id="result-summary" class="section-note" role="status"></p>
+        <div id="results" class="results"></div>
+        <section id="customer-detail" hidden>
+          <button id="back-results" class="text-button">검색 결과로 돌아가기</button>
+          <h2 id="detail-name"></h2>
+          <p id="detail-address"></p>
+          <div id="detail-actions" class="detail-actions">
+            <a id="detail-call" class="primary" hidden>전화 걸기</a
+            ><button id="detail-map" class="quiet">지도에서 보기</button>
+          </div>
+          <dl id="detail-fields" class="detail-fields"></dl>
+        </section>
+      </section>
+      <section id="map-screen" class="screen" hidden>
+        <div class="heading">
+          <h1>묘지 지도</h1>
+        </div>
+        <div class="map-region-picker">
+          <button
+            id="grave-map-region-toggle"
+            class="map-region-toggle"
+            aria-expanded="false"
+            aria-controls="grave-map-region-panel"
+          >
+            지역
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              <path d="m9 5 7 7-7 7" />
+            </svg>
+          </button>
+          <span id="grave-map-region-summary" class="map-region-summary">전체 지역</span>
+          <div id="grave-map-region-panel" class="map-region-panel" hidden>
+            <label class="sr-only" for="grave-map-region-query">지도 지역 검색</label>
+            <input
+              id="grave-map-region-query"
+              type="search"
+              placeholder="지역 검색"
+              autocomplete="off"
+            />
+            <div
+              id="grave-map-regions"
+              class="map-regions"
+              role="group"
+              aria-label="지도 지역 선택 · 여러 지역 선택 가능"
+            ></div>
+            <p id="grave-map-region-empty" class="section-note" role="status" hidden>
+              일치하는 지역이 없습니다.
+            </p>
+          </div>
+        </div>
+        <p id="grave-map-count" class="section-note" role="status"></p>
+        <div class="mobile-map">
+          <iframe
+            id="grave-map-frame"
+            title="묘지 위치 지도"
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+        <p id="grave-map-status" class="section-note" role="status">지도를 연결하고 있습니다.</p>
+        <button id="grave-map-retry" class="text-button">지도 다시 연결</button>
+        <p id="grave-map-missing" class="section-note"></p>
+        <section id="grave-map-detail" class="map-detail" hidden>
+          <button id="grave-map-close" class="text-button">상세 닫기</button>
+          <h2 id="grave-map-name"></h2>
+          <p id="grave-map-address"></p>
+          <p id="grave-map-phone"></p>
+          <p id="grave-map-position" class="section-note"></p>
+          <div id="grave-map-overlap" class="action-row"></div>
+          <button id="grave-map-naver" class="primary full">네이버 위성지도로 보기</button>
+        </section>
+      </section>
+      <section id="shot-screen" class="screen" hidden>
+        <button id="shot-back" class="text-button back-link" type="button">고객 찾기</button>
+        <h1 id="shot-name" tabindex="-1"></h1>
+        <p id="shot-address" class="claim-place"></p>
+        <div class="assigned-shot">
+          <button
+            id="shot-open"
+            class="assigned-shot-open"
+            type="button"
+            aria-label="위치 스크린샷 크게 보기"
+            hidden
+          >
+            <img id="shot-image" alt="등록 때 찍어 둔 위치 스크린샷" />
+          </button>
+          <p id="shot-note" role="status"></p>
+        </div>
+        <button id="shot-map" class="quiet full" type="button">지도로 보기</button>
+      </section>
+      <section id="reports-screen" class="screen" hidden>
+        <div class="heading">
+          <h1>작업 보고</h1>
+        </div>
+        <section id="report-compose" class="report-registration" hidden>
+          <form id="report-form">
+            <fieldset id="report-fields">
+              <label for="report-location">작업 위치</label>
+              <div id="report-location-search" class="search">
+                <input
+                  id="report-location"
+                  type="search"
+                  maxlength="200"
+                  autocomplete="off"
+                  placeholder="주소, 지역·번호 검색"
+                  aria-controls="report-location-results"
+                />
+                <button id="report-location-find" type="button">검색</button>
+              </div>
+              <p id="report-location-status" class="section-note" role="status" hidden></p>
+              <div
+                id="report-location-results"
+                class="report-location-results"
+                role="group"
+                aria-label="작업 위치 검색 결과"
+                hidden
+              ></div>
+              <div id="report-location-selected" class="report-location-selected" hidden>
+                <div>
+                  <strong id="report-location-title"></strong>
+                  <p id="report-location-customer"></p>
+                  <p id="report-location-address"></p>
+                </div>
+                <button id="report-location-change" class="text-button" type="button">변경</button>
+              </div>
+              <label
+                >작업 사진 <span>최대 10장</span
+                ><input
+                  id="report-files"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+              /></label>
+              <div id="report-preview" class="report-preview"></div>
+              <p id="report-photo-count" class="section-note" role="status"></p>
+            </fieldset>
+            <button id="report-submit" class="primary full" type="submit">작업 보고 등록</button>
+          </form>
+        </section>
+      </section>
+      <section id="allocations-screen" class="screen" hidden>
+        <div id="allocation-mobile-list">
+          <div class="heading">
+            <h1 id="allocation-mobile-heading">배정 작업</h1>
+            <button id="allocation-mobile-refresh" class="text-button" type="button">
+              새로고침
+            </button>
+          </div>
+          <p
+            id="allocation-mobile-status"
+            class="section-note"
+            role="status"
+            aria-live="polite"
+          ></p>
+          <div
+            id="allocation-mobile-sheets"
+            class="allocation-mobile-sheets"
+            aria-label="배정된 작업 시트"
+          ></div>
+          <h2 id="allocation-mobile-title"></h2>
+          <p id="allocation-mobile-summary" class="section-note" role="status"></p>
+          <ol id="allocation-mobile-rows" class="allocation-mobile-rows"></ol>
+          <div id="allocation-wheel" class="sheet-wheel" hidden>
+            <span class="sheet-wheel-pill" aria-hidden="true"></span>
+            <div
+              id="allocation-wheel-strip"
+              class="sheet-wheel-strip"
+              role="tablist"
+              aria-label="배정받은 시트"
+            ></div>
+          </div>
+          <div id="allocation-stage" class="sheet-stage" hidden></div>
+        </div>
+        <div id="allocation-mobile-detail" hidden>
+          <button id="allocation-mobile-back" class="text-button back-link" type="button">
+            배정 작업
+          </button>
+          <h1 id="allocation-mobile-detail-title" tabindex="-1">작업 상세</h1>
+          <p id="allocation-mobile-address" class="assigned-work-address"></p>
+          <div id="allocation-mobile-info">
+            <div class="assigned-shot">
+              <button
+                id="allocation-mobile-shot-open"
+                class="assigned-shot-open"
+                type="button"
+                aria-label="위치 스크린샷 크게 보기"
+                hidden
+              >
+                <img id="allocation-mobile-shot-image" alt="등록 때 찍어 둔 위치 스크린샷" />
+              </button>
+              <p id="allocation-mobile-shot-note" role="status"></p>
+            </div>
+            <section id="allocation-mobile-notes" class="assigned-facts" aria-label="작업 안내">
+              <dl class="assigned-size">
+                <div>
+                  <dt>기수</dt>
+                  <dd id="allocation-mobile-gisu"></dd>
+                </div>
+                <div>
+                  <dt>면적</dt>
+                  <dd id="allocation-mobile-area"></dd>
+                </div>
+              </dl>
+              <h2>좌표</h2>
+              <p id="allocation-mobile-location"></p>
+              <h2>고객 요구사항</h2>
+              <p id="allocation-mobile-requirements"></p>
+              <h2>특이사항</h2>
+              <p id="allocation-mobile-special-notes"></p>
+            </section>
+            <section id="allocation-mobile-sent" class="assigned-facts" hidden>
+              <h2>보낸 보고</h2>
+              <p id="allocation-mobile-sent-meta" role="status"></p>
+              <div id="allocation-mobile-sent-photos" class="report-gallery"></div>
+            </section>
+            <button id="allocation-mobile-compose" class="primary full" type="button">
+              작업 사진 보고
+            </button>
+          </div>
+          <div id="allocation-mobile-report" hidden></div>
+        </div>
+      </section>
+      <!-- The report list of the old 작업 확인 (work-reports.js keeps its list code; nothing
+           shows it since step 6-5). -->
+      <div id="report-feed-home" hidden>
+        <div id="report-feed">
+          <p id="reports-status" class="section-note" role="status">작업 보고를 불러오는 중…</p>
+          <button id="reports-retry" class="text-button" type="button" hidden>다시 시도</button>
+          <div id="report-list"></div>
+          <button id="reports-more" class="quiet full" hidden>더 보기</button>
+        </div>
+        <section id="report-detail" hidden>
+          <button id="report-back" class="text-button">목록으로</button>
+          <h2 id="report-detail-title"></h2>
+          <p id="report-detail-customer" hidden></p>
+          <p id="report-detail-meta" class="section-note"></p>
+          <p id="report-photo-status" class="section-note" role="status" hidden></p>
+          <div id="report-gallery" class="report-gallery"></div>
+          <button id="report-use" class="primary full" hidden>문자 준비</button>
+          <button id="report-delete" class="quiet full" hidden>작업 보고 삭제</button>
+        </section>
+      </div>
+      <section id="checks-screen" class="screen" hidden>
+        <div id="checks-list">
+          <div class="heading">
+            <h1>작업 확인</h1>
+            <button id="checks-refresh" class="text-button" type="button">새로고침</button>
+          </div>
+          <p id="checks-status" class="section-note" role="status" aria-live="polite"></p>
+          <ul id="checks-items" class="claim-list"></ul>
+        </div>
+        <div id="claim-compose" hidden>
+          <button id="claim-compose-back" class="text-button back-link" type="button">
+            작업 확인
+          </button>
+          <h1 id="claim-compose-name" tabindex="-1"></h1>
+          <p id="claim-compose-place" class="claim-place"></p>
+          <section class="claim-card">
+            <p id="claim-photos-note" class="claim-label"></p>
+            <div id="claim-photos" class="claim-photos"></div>
+            <label class="claim-label"
+              >금액 (원)<input id="claim-amount" inputmode="numeric" autocomplete="off"
+            /></label>
+          </section>
+          <p class="claim-label claim-bubble-label">보낼 문자</p>
+          <p id="claim-body" class="claim-bubble"></p>
+          <p id="claim-state" class="section-note" role="status"></p>
+          <button id="claim-send" class="primary full" type="button">확인 · 발송</button>
+          <div id="claim-unknown" class="action-row" hidden>
+            <button id="claim-mark-sent" class="quiet" type="button">보냈어요</button
+            ><button id="claim-resend" class="quiet" type="button">다시 보내기</button>
+          </div>
+        </div>
+      </section>
+      <section id="billing-screen" class="screen" hidden>
+        <div id="billing-list">
+          <div class="heading">
+            <h1>청구</h1>
+          </div>
+          <div class="claim-tabs" role="tablist" aria-label="청구 상태">
+            <button id="billing-wait-tab" role="tab" type="button">입금 대기</button
+            ><button id="billing-thanks-tab" role="tab" type="button">최종 문자</button>
+          </div>
+          <p id="billing-status" class="section-note" role="status" aria-live="polite"></p>
+          <ul id="billing-items" class="claim-list"></ul>
+        </div>
+        <div id="billing-detail" hidden>
+          <button id="billing-back" class="text-button back-link" type="button">입금 대기</button>
+          <h1 id="billing-name" tabindex="-1"></h1>
+          <p id="billing-place" class="claim-place"></p>
+          <dl id="billing-steps" class="claim-steps"></dl>
+          <form id="billing-pay" class="claim-card" hidden>
+            <h2>입금 확인</h2>
+            <label class="claim-label"
+              >받은 날<input id="billing-paid-on" type="date" required
+            /></label>
+            <label class="claim-label"
+              >입금자 이름<input id="billing-payer" maxlength="50" autocomplete="off" required
+            /></label>
+            <button class="primary full" type="submit">입금 확인</button>
+          </form>
+          <div id="billing-thanks" hidden>
+            <p class="claim-label claim-bubble-label">보낼 최종 문자</p>
+            <p id="billing-thanks-body" class="claim-bubble"></p>
+            <p id="billing-thanks-state" class="section-note" role="status"></p>
+            <button id="billing-thanks-send" class="primary full" type="button">
+              최종 문자 보내기
+            </button>
+            <div id="billing-thanks-unknown" class="action-row" hidden>
+              <button id="billing-thanks-mark" class="quiet" type="button">보냈어요</button
+              ><button id="billing-thanks-resend" class="quiet" type="button">다시 보내기</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="settings-screen" class="screen" hidden>
+        <div class="heading">
+          <h1>설정</h1>
+          <p id="account-state">사장님이 전달한 계정으로 로그인해주세요.</p>
+        </div>
+        <section class="settings-section">
+          <h2>자료 관리</h2>
+          <button id="sync-now" class="quiet">최신 자료 다시 불러오기</button>
+        </section>
+        <section id="bank-receive-settings" class="settings-section" hidden>
+          <h2>입금 문자 자동 처리</h2>
+          <p id="bank-receive-status" class="section-note" role="status"></p>
+          <button id="bank-enable" class="quiet">이 휴대폰에서 수신</button>
+          <button id="bank-disable" class="quiet" hidden>수신 중단</button>
+        </section>
+        <section id="company-data-tools" hidden>
+          <h2>회사 연결</h2>
+          <label
+            >작업공간 ID<input
+              id="workspace-id"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="데스크톱에서 복사한 ID"
+          /></label>
+        </section>
+        <section id="cloud-section" class="settings-section">
+          <h2>계정</h2>
+          <form id="cloud-form">
+            <fieldset id="cloud-fields">
+              <label
+                >아이디 또는 이메일<input
+                  id="cloud-email"
+                  type="text"
+                  autocomplete="username"
+                  autocapitalize="none"
+                  required
+              /></label>
+              <label
+                >비밀번호<input
+                  id="cloud-password"
+                  type="password"
+                  autocomplete="current-password"
+                  required
+              /></label>
+              <div id="login-company" hidden>
+                <input id="cloud-url" type="hidden" />
+                <input id="cloud-key" type="hidden" />
+              </div>
+              <button type="submit" class="primary full">로그인</button>
+            </fieldset>
+          </form>
+          <button id="cloud-logout" class="text-button" hidden>로그아웃</button>
+        </section>
+      </section>
+    </main>
+    <nav class="bottom-nav" aria-label="메뉴">
+      <button data-screen="search" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10" cy="10" r="6.5" />
+          <path d="m15 15 6 6" /></svg
+        >고객 찾기</button
+      ><button data-screen="allocations" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 4h12v17H4V4h4M8 2h8v4H8zM8 11h8M8 16h8" /></svg
+        ><span id="allocation-mobile-nav-label">배정 작업</span></button
+      ><button data-screen="done" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="m8 12 3 3 5-6" /></svg
+        >보고 완료</button
+      ><button data-screen="checks" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <circle cx="8" cy="9" r="1.5" />
+          <path d="m3 17 5-5 4 4 4-6 5 7" /></svg
+        >작업 확인</button
+      ><button data-screen="billing" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h4" /></svg
+        >청구</button
+      ><button data-screen="settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 17h16" />
+          <circle cx="9" cy="7" r="3" />
+          <circle cx="15" cy="17" r="3" /></svg
+        >설정
+      </button>
+    </nav>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <dialog id="report-image-viewer" aria-label="작업 사진 크게 보기">
+      <div class="report-image-toolbar">
+        <span id="report-image-caption"></span>
+        <button id="report-image-close" class="quiet" type="button">닫기</button>
+      </div>
+      <img id="report-image-full" alt="" />
+    </dialog>
+    <dialog id="confirmation" aria-labelledby="confirm-title" aria-describedby="confirm-copy">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-copy"></p>
+      <div class="action-row">
+        <button id="confirm-no" class="quiet">취소</button
+        ><button id="confirm-yes" class="primary">확인</button>
+      </div>
+    </dialog>
+    <dialog id="location-dialog" aria-labelledby="location-dialog-title">
+      <button id="location-close" class="text-button">닫기</button>
+      <h2 id="location-dialog-title">좌표 수정 요청</h2>
+      <p id="location-address"></p>
+      <p id="location-status" role="status"></p>
+      <div class="action-row">
+        <button id="location-measure">현재 위치 가져오기</button
+        ><button id="location-submit" class="primary" disabled>이 위치로 수정 요청</button>
+      </div>
+    </dialog>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">데모 업무</string>
+    <string name="title_activity_main">데모 업무</string>
+    <string name="package_name">kr.demo.field</string>
+    <string name="custom_url_scheme">kr.demo.field</string>
+</resources>

@@ -1,0 +1,25 @@
+{
+  "name": "demo-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node ../scripts/build-mobile.cjs",
+    "preview": "node ../scripts/preview-mobile.cjs",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "cap open android",
+    "ios:sync": "npm run build && cap sync ios",
+    "ios:open": "cap open ios",
+    "native:sync": "npm run build && cap sync",
+    "android:build": "node ../scripts/android/build-android-debug.cjs",
+    "ios:build": "npm run ios:sync && xcodebuild -project ios/App/App.xcodeproj -scheme App -destination generic/platform=iOS -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=NO build",
+    "android:release": "node ../scripts/android/build-android-release.cjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}

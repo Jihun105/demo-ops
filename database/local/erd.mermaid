@@ -1,0 +1,36 @@
+erDiagram
+    customers ||--o{ graves : "묘지 보유"
+    graves ||--o{ payments : "연도별 청구 기준 금액"
+
+    customers {
+        int id PK
+        text name "성함"
+        text phone "숫자만"
+        text phone_raw "엑셀 원본"
+        int phone_ok "형식 확인 여부"
+        text memo "고객 요구사항"
+        text special_notes "고객 특이사항"
+        text deleted_at "보관 시각"
+    }
+
+    graves {
+        int id PK
+        int customer_id FK
+        text address "묘지위치 원문"
+        text gubun "구분"
+        text seq "순서"
+        text gisu "기수"
+        real pyeong "평수"
+        text extra_json "미매핑 컬럼 보존"
+        int source_row
+        text deleted_at "미연결 묘지 보관 시각"
+    }
+
+    payments {
+        int id PK
+        int grave_id FK
+        int year "연도"
+        int amount "청구 기준 금액"
+        text kind "annual"
+        text paid_at
+    }

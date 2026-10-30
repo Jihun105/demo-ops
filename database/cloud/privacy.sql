@@ -1,0 +1,9 @@
+-- Privacy successor: financial originals stay restricted; expiry automation is deferred.
+-- @include privacy/transfer.sql
+-- @include privacy/finance.sql
+-- @include privacy/deletion.sql
+-- @include privacy/protocol.sql
+-- @include privacy/projections.sql
+-- @include privacy/retention.sql
+-- @include privacy/storage-keys.sql
+-- @include privacy/storage-check.sql

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>데모 · 로그인</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="login.js" defer></script>
+  </head>
+  <body class="login-page">
+    <header class="titlebar">
+      <div class="window-brand">
+        <img src="brand.svg" alt="" width="24" height="24" /><span>(주)데모 업무관리</span>
+      </div>
+      <div class="window-controls">
+        <button data-window="minimize" aria-label="최소화">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14" />
+          </svg></button
+        ><button data-window="close" class="close-window" aria-label="닫기">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="m5 5 14 14M5 19 19 5" />
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main class="login-shell">
+      <div class="login-heading">
+        <img src="brand.svg" alt="" width="56" height="56" />
+        <h1>데모 업무관리</h1>
+      </div>
+      <form id="login-form">
+        <fieldset id="login-fields">
+          <label
+            >이메일 또는 아이디<input
+              id="login-email"
+              type="text"
+              autocomplete="username"
+              required
+              autofocus
+          /></label>
+          <label
+            >비밀번호<input
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              required
+          /></label>
+          <details id="login-connection" hidden>
+            <summary>회사 연결 설정</summary>
+            <label
+              >프로젝트 URL<input
+                id="login-url"
+                type="url"
+                required
+                placeholder="https://프로젝트.supabase.co"
+            /></label>
+            <label
+              >Publishable 또는 anon key<input
+                id="login-key"
+                type="password"
+                autocomplete="off"
+                required
+            /></label>
+            <label>작업공간 ID<input id="login-workspace" required autocomplete="off" /></label>
+          </details>
+          <p id="login-error" role="alert" hidden></p>
+          <button type="submit" id="login-submit" class="primary-button">로그인</button>
+        </fieldset>
+      </form>
+    </main>
+  </body>
+</html>
