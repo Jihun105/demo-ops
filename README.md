@@ -56,25 +56,12 @@ flowchart LR
 
 ## 구조
 
-```mermaid
-flowchart TB
-  subgraph PC[사무실 PC · Electron]
-    UI[화면] --> Local[(SQLite 조회 사본)]
-  end
-  subgraph Phone[휴대폰 · Capacitor]
-    PUI[화면] --> Native[네이티브 플러그인<br/>문자 발송 · 은행 문자 수신 · 지도]
-  end
-  subgraph Server[Supabase]
-    DB[(PostgreSQL<br/>업무 원본 · 권한 · 감사 기록)]
-    FN[Edge Functions<br/>직원 계정 · 사진 보고 · 입금 · 경로]
-  end
-  R2[(Cloudflare R2<br/>작업 사진 · Google Earth 원본)]
-  PC <--> DB
-  Phone <--> DB
-  PC --> FN
-  Phone --> FN
-  FN --> R2
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/architecture-dark.png">
+  <img alt="데모 업무 자동화 아키텍처: 사무실 PC(Electron·SQLite)와 현장 휴대폰 앱(Capacitor·Android·iOS)이 Supabase(PostgreSQL·Realtime·Auth·Edge Functions)를 함께 쓰고, 작업 사진은 Cloudflare R2에 저장한다" src="docs/images/architecture.png">
+</picture>
+
+<sub>파란 선: 현장 사진 보고 흐름 · 로고는 각 회사의 상표입니다 · 그림: [stack-diagram](https://github.com/caru-ini/stack-diagram)</sub>
 
 - 업무 원본은 서버에 있고, 여러 PC와 휴대폰이 같은 자료를 봅니다. PC의 SQLite는 빠른 조회를 위한 사본입니다.
 - 서버 연결은 `src/backend`(인증·데이터·실시간), 업무 처리는 `src/server`로 나눠 서버를 바꾸더라도 화면 코드는 그대로 두도록 했습니다.
